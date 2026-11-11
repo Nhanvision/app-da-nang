@@ -16,7 +16,19 @@
       <button data-view="library">Kho đề</button>
       <button data-view="history">Lịch sử điểm</button>
     </nav>
+    <button id="btn-kid" class="lock">🔒 Chế độ con</button>
   </header>
+
+  <dialog id="pin-dialog">
+    <form method="dialog">
+      <p id="pin-msg"></p>
+      <input id="pin-input" type="password" inputmode="numeric" autocomplete="off" maxlength="8" aria-label="Mã PIN">
+      <div class="row">
+        <button type="button" id="pin-cancel">Huỷ</button>
+        <button type="submit" value="ok" class="primary">OK</button>
+      </div>
+    </form>
+  </dialog>
 
   <main>
     <!-- SOẠN ĐỀ -->
@@ -126,6 +138,7 @@
         <p class="muted">Xuất đề ra file để gửi cho phụ huynh khác hoặc sao lưu. Dữ liệu chỉ lưu trên máy này.</p>
         <button id="btn-export">⬇️ Xuất đề hiện tại (.json)</button>
         <label class="filebtn">⬆️ Nhập đề từ file<input id="file-import" type="file" accept="application/json" hidden></label>
+        <button id="btn-pin">🔑 Đặt / đổi mã PIN</button>
       </div>
     </section>
     <!-- LỊCH SỬ ĐIỂM -->

@@ -51,6 +51,13 @@ button.danger { color: var(--danger); border-color: var(--danger); }
 .histlist li { padding: 8px 0; border-bottom: 1px solid var(--line); }
 .histlist summary { cursor: pointer; display: flex; justify-content: space-between; gap: 8px; }
 .histlist ul { margin: 6px 0 0 18px; color: var(--muted); font-size: .9rem; }
+.lock { background: rgba(255,255,255,.15); color: #fff; border-color: rgba(255,255,255,.6); border-radius: 999px; }
+body.kid #nav button:not([data-view=quiz]) { display: none; }
+body.kid #view-print { display: none !important; }
+dialog { border: 0; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.3); max-width: 340px; width: calc(100% - 32px); }
+dialog::backdrop { background: rgba(0,0,0,.45); }
+dialog p { margin: 0 0 10px; }
+dialog .row { margin-top: 12px; justify-content: flex-end; }
 footer { text-align: center; color: var(--muted); font-size: .8rem; padding: 20px; }
 @media print {
   body { background: #fff; }

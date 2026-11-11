@@ -17,6 +17,7 @@
       const s = JSON.parse(localStorage.getItem(STORE_KEY));
       if (s && Array.isArray(s.sheets) && s.sheets.length) {
         if (!Array.isArray(s.history)) s.history = [];
+        if (s.kidMode && !s.pin) s.kidMode = false;
         return s;
       }
     } catch (e) { /* storage unavailable or corrupt */ }
@@ -30,6 +31,7 @@
 
   // ---------- Navigation ----------
   function show(view) {
+    if (state.kidMode) view = 'quiz';
     document.querySelectorAll('.view').forEach((v) => v.classList.toggle('active', v.id === 'view-' + view));
     document.querySelectorAll('#nav button').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
     if (view === 'quiz') renderQuiz();
@@ -408,7 +410,83 @@
     }
   });
 
+  // ---------- Kid mode (rào chắn nhẹ, chạy hoàn toàn trên trình duyệt) ----------
+  const hashStr = (str) => {
+    let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (let i = 0; i < str.length; i++) {
+      const ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+  };
+
+  function askPin(msg) {
+    return new Promise((resolve) => {
+      const dlg = $('#pin-dialog'), input = $('#pin-input');
+      $('#pin-msg').textContent = msg;
+      input.value = '';
+      dlg.returnValue = '';
+      dlg.addEventListener('close', () => resolve(dlg.returnValue === 'ok' ? input.value : null), { once: true });
+      dlg.showModal();
+      input.focus();
+    });
+  }
+  $('#pin-cancel').addEventListener('click', () => $('#pin-dialog').close('cancel'));
+
+  async function setNewPin() {
+    const a = await askPin('Đặt mã PIN gồm 4–8 chữ số (bố mẹ giữ, đừng cho con biết):');
+    if (a === null) return false;
+    if (!/^\d{4,8}$/.test(a)) { alert('Mã PIN phải gồm 4–8 chữ số.'); return false; }
+    const b = await askPin('Nhập lại mã PIN để xác nhận:');
+    if (b === null) return false;
+    if (b !== a) { alert('Hai lần nhập không khớp.'); return false; }
+    const salt = uid();
+    state.pin = { salt, hash: hashStr(salt + a) };
+    save();
+    return true;
+  }
+
+  let pinFails = 0, lockedUntil = 0;
+  async function checkPin(msg) {
+    if (Date.now() < lockedUntil) {
+      alert(`Nhập sai nhiều lần. Thử lại sau ${Math.ceil((lockedUntil - Date.now()) / 1000)} giây.`);
+      return false;
+    }
+    const p = await askPin(msg);
+    if (p === null) return false;
+    if (hashStr(state.pin.salt + p) === state.pin.hash) { pinFails = 0; return true; }
+    if (++pinFails >= 5) { pinFails = 0; lockedUntil = Date.now() + 30000; alert('Sai 5 lần. Khoá 30 giây.'); }
+    else alert('Sai mã PIN.');
+    return false;
+  }
+
+  function applyMode() {
+    document.body.classList.toggle('kid', !!state.kidMode);
+    $('#btn-kid').textContent = state.kidMode ? '🔓 Thoát chế độ con' : '🔒 Chế độ con';
+    if (state.kidMode) $('#print-area').innerHTML = ''; // không để lộ đáp án qua Ctrl+P
+  }
+
+  $('#btn-kid').addEventListener('click', async () => {
+    if (state.kidMode) {
+      if (await checkPin('Nhập mã PIN của bố mẹ để thoát chế độ con:')) {
+        state.kidMode = false; save(); applyMode(); show('edit');
+      }
+      return;
+    }
+    if (!state.pin && !(await setNewPin())) return;
+    state.kidMode = true; save(); applyMode(); show('quiz');
+  });
+
+  $('#btn-pin').addEventListener('click', async () => {
+    if (state.pin && !(await checkPin('Nhập mã PIN hiện tại:'))) return;
+    if (await setNewPin()) alert('Đã lưu mã PIN mới.');
+  });
+
   // ---------- Init ----------
   syncTypeFields();
   renderEdit();
+  applyMode();
+  if (state.kidMode) show('quiz');
 })();

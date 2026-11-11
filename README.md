@@ -5,6 +5,7 @@
 ## Tính năng (MVP)
 - **Soạn đề**: tự viết câu hỏi (điền đáp án, trắc nghiệm, tự luận) hoặc **tạo nhanh** bài toán cộng/trừ/nhân/chia theo khoảng số tuỳ chọn.
 - **Từ vựng tiếng Anh**: dán danh sách `english - nghĩa`, app tự tạo câu Anh→Việt, Việt→Anh, trắc nghiệm chọn nghĩa, điền chữ cái còn thiếu, sắp xếp chữ cái thành từ, hoặc nghe phát âm rồi viết lại từ (dùng giọng đọc có sẵn của trình duyệt). Nhiều nghĩa ngăn bằng `/`, nhập nghĩa nào cũng được chấm đúng.
+- **Chế độ con**: bố mẹ bấm "🔒 Chế độ con" (lần đầu đặt mã PIN 4–8 số) để chỉ còn tab làm bài; muốn thoát phải nhập PIN. Đây là rào chắn nhẹ cho trẻ nhỏ, không phải bảo mật thật vì mọi thứ chạy trên trình duyệt.
 - **Con làm bài**: làm trực tiếp trên màn hình, tự chấm điểm câu điền đáp án và trắc nghiệm.
 - **Lịch sử điểm**: mỗi lần con nộp bài, điểm được tự lưu. Xem theo từng bé: số lần làm, điểm trung bình, biểu đồ 10 lần gần nhất, danh sách câu sai để ôn lại; xuất ra `.csv` mở được bằng Excel.
 - **In đề**: xuất bản in / PDF, có bản kèm đáp án cho bố mẹ.
