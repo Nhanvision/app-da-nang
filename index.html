@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đề Của Bố Mẹ</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar no-print">
+    <h1>📝 Đề Của Bố Mẹ</h1>
+    <nav id="nav">
+      <button data-view="edit" class="active">Soạn đề</button>
+      <button data-view="quiz">Con làm bài</button>
+      <button data-view="print">In đề</button>
+      <button data-view="library">Kho đề</button>
+      <button data-view="history">Lịch sử điểm</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- SOẠN ĐỀ -->
+    <section id="view-edit" class="view active no-print">
+      <div class="card">
+        <h2>Thông tin đề</h2>
+        <div class="row">
+          <label>Tên đề<input id="sheet-title" placeholder="VD: Ôn tập cộng trừ tuần 3"></label>
+          <label>Tên con<input id="sheet-child" placeholder="VD: Bé Na"></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Tạo nhanh bài toán tự động</h2>
+        <div class="row">
+          <fieldset class="ops">
+            <legend>Phép tính</legend>
+            <label><input type="checkbox" name="op" value="+" checked> Cộng</label>
+            <label><input type="checkbox" name="op" value="-"> Trừ</label>
+            <label><input type="checkbox" name="op" value="×"> Nhân</label>
+            <label><input type="checkbox" name="op" value="÷"> Chia</label>
+          </fieldset>
+          <label>Số nhỏ nhất<input id="gen-min" type="number" value="1"></label>
+          <label>Số lớn nhất<input id="gen-max" type="number" value="20"></label>
+          <label>Số câu<input id="gen-count" type="number" value="10" min="1" max="100"></label>
+        </div>
+        <label class="inline"><input type="checkbox" id="gen-nonneg" checked> Phép trừ không ra số âm</label>
+        <button id="btn-generate" class="primary">+ Thêm các câu này vào đề</button>
+      </div>
+
+      <div class="card">
+        <h2>Tạo nhanh từ vựng tiếng Anh</h2>
+        <label>Danh sách từ (mỗi dòng một từ, dạng <code>english - nghĩa tiếng Việt</code>; nhiều nghĩa ngăn bằng <code>/</code>)
+          <textarea id="vocab-list" rows="6" placeholder="apple - quả táo&#10;dog - con chó&#10;book - quyển sách&#10;teacher - giáo viên / cô giáo"></textarea>
+        </label>
+        <div class="row">
+          <label>Dạng bài
+            <select id="vocab-mode">
+              <option value="en2vi">Anh → Việt (điền nghĩa)</option>
+              <option value="vi2en">Việt → Anh (điền từ)</option>
+              <option value="mc">Trắc nghiệm chọn nghĩa đúng</option>
+              <option value="missing">Điền chữ cái còn thiếu</option>
+              <option value="scramble">Sắp xếp chữ cái thành từ</option>
+              <option value="listen">Nghe phát âm, viết lại từ</option>
+            </select>
+          </label>
+          <label>Số câu (tối đa bằng số từ)<input id="vocab-count" type="number" value="10" min="1" max="100"></label>
+        </div>
+        <button id="btn-vocab" class="primary">+ Thêm các câu từ vựng vào đề</button>
+      </div>
+
+      <div class="card">
+        <h2>Tự ra câu hỏi theo ý mình</h2>
+        <div class="row">
+          <label>Dạng câu
+            <select id="q-type">
+              <option value="fill">Điền đáp án ngắn</option>
+              <option value="mc">Trắc nghiệm</option>
+              <option value="essay">Tự luận (bố mẹ chấm)</option>
+            </select>
+          </label>
+        </div>
+        <label>Nội dung câu hỏi<textarea id="q-text" rows="3" placeholder="VD: Mẹ có 5 quả cam, cho em 2 quả. Mẹ còn mấy quả cam?"></textarea></label>
+        <div id="q-mc" hidden>
+          <label>Các lựa chọn (mỗi dòng một đáp án)<textarea id="q-options" rows="4" placeholder="3 quả&#10;7 quả&#10;2 quả"></textarea></label>
+          <label>Đáp án đúng là lựa chọn số<input id="q-mc-answer" type="number" min="1" value="1"></label>
+        </div>
+        <label id="q-answer-wrap">Đáp án đúng<input id="q-answer" placeholder="VD: 3"></label>
+        <button id="btn-add" class="primary">+ Thêm câu hỏi</button>
+      </div>
+
+      <div class="card">
+        <div class="row between">
+          <h2>Các câu trong đề (<span id="q-count">0</span>)</h2>
+          <button id="btn-clear" class="danger">Xoá hết</button>
+        </div>
+        <ol id="q-list" class="qlist"></ol>
+        <p id="q-empty" class="muted">Chưa có câu nào. Hãy tạo nhanh hoặc tự ra câu hỏi ở trên.</p>
+      </div>
+    </section>
+
+    <!-- CON LÀM BÀI -->
+    <section id="view-quiz" class="view no-print">
+      <div class="card" id="quiz-box"></div>
+    </section>
+
+    <!-- IN ĐỀ -->
+    <section id="view-print" class="view">
+      <div class="card no-print">
+        <label class="inline"><input type="checkbox" id="print-answers"> Hiện đáp án (bản cho bố mẹ)</label>
+        <button id="btn-print" class="primary">🖨️ In / Lưu PDF</button>
+      </div>
+      <div id="print-area" class="paper"></div>
+    </section>
+
+    <!-- KHO ĐỀ -->
+    <section id="view-library" class="view no-print">
+      <div class="card">
+        <div class="row between">
+          <h2>Kho đề đã lưu</h2>
+          <button id="btn-new" class="primary">+ Đề mới</button>
+        </div>
+        <ul id="lib-list" class="liblist"></ul>
+      </div>
+      <div class="card">
+        <h2>Sao lưu &amp; chia sẻ</h2>
+        <p class="muted">Xuất đề ra file để gửi cho phụ huynh khác hoặc sao lưu. Dữ liệu chỉ lưu trên máy này.</p>
+        <button id="btn-export">⬇️ Xuất đề hiện tại (.json)</button>
+        <label class="filebtn">⬆️ Nhập đề từ file<input id="file-import" type="file" accept="application/json" hidden></label>
+      </div>
+    </section>
+    <!-- LỊCH SỬ ĐIỂM -->
+    <section id="view-history" class="view no-print">
+      <div class="card">
+        <div class="row between">
+          <h2>Lịch sử điểm</h2>
+          <label class="inline">Con
+            <select id="hist-child"></select>
+          </label>
+        </div>
+        <div id="hist-summary"></div>
+        <div id="hist-chart" class="chart" aria-label="Biểu đồ điểm các lần gần nhất"></div>
+        <ul id="hist-list" class="histlist"></ul>
+        <p id="hist-empty" class="muted">Chưa có lần làm bài nào. Điểm sẽ tự lưu mỗi khi con bấm "Nộp bài".</p>
+        <div class="row">
+          <button id="btn-hist-csv">⬇️ Xuất lịch sử (.csv)</button>
+          <button id="btn-hist-clear" class="danger">Xoá lịch sử đang xem</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="no-print">Mã nguồn mở (MIT) · Dữ liệu lưu trên máy bạn, không gửi đi đâu.</footer>
+  <script src="js/app.js"></script>
+</body>
+</html>
