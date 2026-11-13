@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sổ Chi Tiêu</title>
+<meta name="theme-color" content="#2f6fed">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Chi Tiêu">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <h1>💰 Sổ Chi Tiêu</h1>
+  <nav class="tabs">
+    <button data-tab="day" class="active">Hàng ngày</button>
+    <button data-tab="month">Hàng tháng</button>
+    <button data-tab="set">Cài đặt</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ===== NGÀY ===== -->
+  <section id="tab-day">
+    <div class="nav">
+      <button id="dayPrev" aria-label="Ngày trước">‹</button>
+      <input type="date" id="dayPick">
+      <button id="dayNext" aria-label="Ngày sau">›</button>
+      <button id="dayToday" class="ghost">Hôm nay</button>
+    </div>
+    <div class="cards">
+      <div class="card out"><span>Chi</span><b id="dayOut">0</b></div>
+      <div class="card in"><span>Thu</span><b id="dayIn">0</b></div>
+    </div>
+    <ul id="dayList" class="list"></ul>
+  </section>
+
+  <!-- ===== THÁNG ===== -->
+  <section id="tab-month" hidden>
+    <div class="nav">
+      <button id="monPrev" aria-label="Tháng trước">‹</button>
+      <input type="month" id="monPick">
+      <button id="monNext" aria-label="Tháng sau">›</button>
+    </div>
+    <div class="cards three">
+      <div class="card out"><span>Tổng chi</span><b id="monOut">0</b></div>
+      <div class="card in"><span>Tổng thu</span><b id="monIn">0</b></div>
+      <div class="card"><span>Còn lại</span><b id="monBal">0</b></div>
+    </div>
+
+    <div class="panel">
+      <div class="row-between">
+        <h2>Ngân sách tháng</h2>
+        <button id="budgetBtn" class="ghost">Đặt mức</button>
+      </div>
+      <div class="bar big"><i id="budgetBar"></i></div>
+      <p id="budgetText" class="muted"></p>
+    </div>
+
+    <div class="panel">
+      <h2>Chi theo danh mục</h2>
+      <div id="catBars"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Chi theo ngày</h2>
+      <div id="dayChart" class="chart"></div>
+    </div>
+
+    <div class="panel">
+      <div class="row-between">
+        <h2>Giao dịch trong tháng</h2>
+        <button id="csvBtn" class="ghost">Xuất CSV</button>
+      </div>
+      <ul id="monList" class="list"></ul>
+    </div>
+  </section>
+
+  <!-- ===== CÀI ĐẶT ===== -->
+  <section id="tab-set" hidden>
+    <div class="panel">
+      <h2>Khoản định kỳ hàng tháng</h2>
+      <p class="muted">Tiền nhà, internet… tự được ghi vào đúng ngày mỗi tháng.</p>
+      <ul id="recList" class="list"></ul>
+      <button id="recAdd" class="ghost wide">+ Thêm khoản định kỳ</button>
+    </div>
+    <div class="panel">
+      <h2>Ngân sách theo danh mục (mỗi tháng)</h2>
+      <p class="muted">Để trống nếu không giới hạn.</p>
+      <div id="budList"></div>
+    </div>
+    <div class="panel">
+      <h2>Đồng bộ qua Google Sheet</h2>
+      <p class="muted">Dùng chung dữ liệu giữa điện thoại và máy tính. Làm theo <b>HUONG-DAN-DONG-BO.md</b> để lấy link và mã.</p>
+      <label class="fld">Link Web App (kết thúc bằng /exec)
+        <input id="syncUrl" type="text" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off">
+      </label>
+      <label class="fld">Mã bí mật
+        <input id="syncKey" type="text" autocomplete="off">
+      </label>
+      <div class="actions">
+        <button id="syncSave">Lưu &amp; đồng bộ</button>
+        <button id="syncOff" class="danger" hidden>Ngắt kết nối</button>
+      </div>
+      <p id="syncStatus" class="muted"></p>
+    </div>
+    <div class="panel">
+      <h2>Cài lên điện thoại</h2>
+      <p class="muted" id="installHint">Android (Chrome): menu ⋮ → "Cài đặt ứng dụng". iPhone (Safari): nút Chia sẻ → "Thêm vào Màn hình chính".</p>
+      <button id="installBtn" class="wide" hidden>Cài app</button>
+    </div>
+  </section>
+</main>
+
+<button id="fab" aria-label="Thêm giao dịch">+</button>
+
+<dialog id="dlg">
+  <form method="dialog" id="form">
+    <h2 id="dlgTitle">Thêm giao dịch</h2>
+    <div class="seg">
+      <label><input type="radio" name="type" value="out" checked><span>Chi</span></label>
+      <label><input type="radio" name="type" value="in"><span>Thu</span></label>
+    </div>
+    <label>Số tiền (đ)
+      <input id="fAmount" type="text" inputmode="numeric" placeholder="50.000" required autocomplete="off">
+    </label>
+    <label>Danh mục
+      <select id="fCat"></select>
+    </label>
+    <label>Ghi chú
+      <input id="fNote" type="text" placeholder="Ăn trưa, đổ xăng…" maxlength="80">
+    </label>
+    <label>Ngày
+      <input id="fDate" type="date" required>
+    </label>
+    <div class="actions">
+      <button type="button" id="fDel" class="danger" hidden>Xoá</button>
+      <span class="spacer"></span>
+      <button type="button" id="fCancel" class="ghost">Huỷ</button>
+      <button type="submit" id="fSave">Lưu</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="rdlg">
+  <form method="dialog" id="rform">
+    <h2 id="rTitle">Khoản định kỳ</h2>
+    <div class="seg">
+      <label><input type="radio" name="rtype" value="out" checked><span>Chi</span></label>
+      <label><input type="radio" name="rtype" value="in"><span>Thu</span></label>
+    </div>
+    <label>Số tiền (đ)
+      <input id="rAmount" type="text" inputmode="numeric" required autocomplete="off">
+    </label>
+    <label>Danh mục
+      <select id="rCat"></select>
+    </label>
+    <label>Tên khoản
+      <input id="rNote" type="text" placeholder="Tiền nhà, internet…" maxlength="80">
+    </label>
+    <label>Ngày trong tháng (1–31)
+      <input id="rDay" type="number" min="1" max="31" value="1" required>
+    </label>
+    <label>Bắt đầu từ tháng
+      <input id="rStart" type="month" required>
+    </label>
+    <div class="actions">
+      <button type="button" id="rDel" class="danger" hidden>Xoá</button>
+      <span class="spacer"></span>
+      <button type="button" id="rCancel" class="ghost">Huỷ</button>
+      <button type="submit">Lưu</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
