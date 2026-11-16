@@ -296,6 +296,13 @@ $('admAdd').onclick = () => {
     (bad.length ? `. ${bad.length} dòng sai định dạng được giữ lại trong ô để anh sửa.` : '.');
   renderAdmin();
 };
+$('admPin').onclick = () => {
+  const v = prompt('Nhập mã PIN mới (4–8 chữ số):');
+  if (v === null) return;
+  if (!/^\d{4,8}$/.test(v.trim())) return alert('PIN phải gồm 4–8 chữ số.');
+  store.set('pin', v.trim());
+  $('admMsg').textContent = 'Đã đổi mã PIN.';
+};
 $('admClear').onclick = () => {
   const c = getCustom();
   if (!c[admLvl].length || !confirm('Xoá toàn bộ ' + c[admLvl].length + ' từ riêng của cấp ' + LEVELS[admLvl].name + '?')) return;
