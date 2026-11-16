@@ -102,7 +102,7 @@ function refreshMenu() {
   }
 }
 function showMenu() {
-  stopLoop(); clearFish();
+  stopLoop(); clearFish(); delete $('sea').dataset.lvl;
   $('menu').hidden = false; $('result').hidden = true; $('hud').hidden = true;
   refreshMenu();
 }
@@ -120,6 +120,7 @@ function startGame(lvl) {
     idx: 0, score: 0, lives: LIVES, combo: 0, wrong: [],
     fish: [], target: null, askedAt: 0, missedThis: false, locked: false
   };
+  $('sea').dataset.lvl = lvl;
   $('menu').hidden = true; $('result').hidden = true; $('hud').hidden = false;
   nextWord();
   lastT = performance.now();
@@ -279,6 +280,33 @@ function buildBgFish() {
     box.appendChild(d);
   }
 }
+const SHARK = `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="100" viewBox="0 -4 240 100"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b7285"/><stop offset=".55" stop-color="#8aa0b2"/><stop offset=".62" stop-color="#eef3f6"/><stop offset="1" stop-color="#dfe8ee"/></linearGradient></defs>
+<g class="stail"><path d="M44,50 L4,12 Q20,48 6,88 Z" fill="#5b7285"/></g>
+<path d="M100,30 L126,-3 L142,28 Z" fill="#5b7285"/><path d="M150,68 L130,94 L172,72 Z" fill="#6b8294"/>
+<path d="M36,50 C70,28 150,18 214,46 C228,52 236,52 238,54 C220,60 200,70 150,76 C100,80 60,70 36,50Z" fill="url(#sg)"/>
+<g stroke="#3d4f5e" stroke-width="2" fill="none" stroke-linecap="round"><path d="M172,44 q4,8 0,16"/><path d="M180,44 q4,8 0,16"/><path d="M188,45 q4,7 0,14"/><path d="M236,56 Q222,64 204,58"/></g>
+<circle cx="208" cy="48" r="3.5" fill="#111"/></svg>`;
+const TURTLE = `<svg xmlns="http://www.w3.org/2000/svg" width="150" height="90" viewBox="0 0 150 90">
+<g class="flip2"><path d="M44,56 Q22,84 4,74 Q28,66 42,50Z" fill="#6fb36b"/></g>
+<path d="M18,54 L8,50 L14,60Z" fill="#6fb36b"/>
+<path d="M28,58 L112,58 Q70,72 28,58Z" fill="#d9c98b"/>
+<path d="M28,58 C28,14 106,14 112,58Z" fill="#3f8f4f"/>
+<g fill="none" stroke="#2a6a38" stroke-width="2.5"><path d="M52,58 L58,34 L82,34 L88,58"/><path d="M58,34 L50,22 M82,34 L92,24 M70,34 L70,18"/></g>
+<circle cx="124" cy="46" r="12" fill="#7bc27a"/><circle cx="129" cy="43" r="2.8" fill="#111"/><path d="M130,52 q-5,3 -9,0" stroke="#2a6a38" stroke-width="1.8" fill="none"/>
+<g class="flip1"><path d="M96,58 Q120,86 146,76 Q122,64 106,52Z" fill="#6fb36b"/></g></svg>`;
+function spawnCrosser() {
+  if (document.hidden) return;
+  const shark = Math.random() < 0.5, d = document.createElement('div');
+  d.className = 'cr' + (Math.random() < 0.5 ? ' l' : '');
+  d.style.top = (shark ? rand(10, 50) : rand(25, 60)) + '%';
+  d.style.animationDuration = (shark ? rand(11, 15) : rand(20, 26)) + 's';
+  d.innerHTML = shark ? SHARK : TURTLE;
+  d.onanimationend = () => d.remove();
+  $('crossers').appendChild(d);
+}
+setTimeout(spawnCrosser, 2500);
+setInterval(spawnCrosser, 14000);
+
 buildFloor(); buildBgFish();
 let rzT; addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(buildFloor, 200); });
 

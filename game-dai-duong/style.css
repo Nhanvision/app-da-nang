@@ -43,8 +43,8 @@ html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-syst
 #bgFish .bf{position:absolute;left:0;animation:swimR linear infinite}
 #bgFish .bf.l{animation-name:swimL}
 #bgFish .bf.l svg{transform:scaleX(-1)}
-@keyframes swimR{from{transform:translateX(-200px)}to{transform:translateX(100vw)}}
-@keyframes swimL{from{transform:translateX(100vw)}to{transform:translateX(-200px)}}
+@keyframes swimR{from{transform:translateX(-320px)}to{transform:translateX(100vw)}}
+@keyframes swimL{from{transform:translateX(100vw)}to{transform:translateX(-320px)}}
 /* cá chơi */
 .fish{position:absolute;left:0;top:0;cursor:pointer;will-change:transform}
 .fish .in{position:relative;transition:transform .15s;filter:drop-shadow(0 4px 4px rgba(0,0,0,.3))}
@@ -63,3 +63,16 @@ html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-syst
 @keyframes pop{50%{transform:scale(1.4);filter:brightness(1.3)}to{transform:scale(0);opacity:0}}
 .fish.bad .in{animation:shake .4s}
 @keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+
+/* màu nước theo cấp độ */
+#sea{transition:background 1s}
+#sea[data-lvl=basic]{background:linear-gradient(#8ee8f2 0%,#27b3d6 55%,#0b6f9e 100%)}
+#sea[data-lvl=adv]{background:linear-gradient(#2b4a9b 0%,#14275e 55%,#070f2e 100%)}
+/* sinh vật bơi ngang qua */
+#crossers{position:absolute;inset:0;pointer-events:none}
+#crossers .cr{position:absolute;left:0;animation:swimR linear forwards;opacity:.85}
+#crossers .cr.l{animation-name:swimL}
+#crossers .cr.l svg{transform:scaleX(-1)}
+.stail{transform-origin:40px 50px;animation:wag .9s ease-in-out infinite alternate}
+.flip1{transform-origin:100px 55px;animation:flap .9s ease-in-out infinite alternate}
+.flip2{transform-origin:40px 55px;animation:flap .9s ease-in-out infinite alternate-reverse}
