@@ -16,6 +16,6 @@ Chạy: mở `index.html` (trang con) hoặc `admin.html` (trang bố mẹ) ho�
 ## Bán bản đầy đủ (dùng thử + mã kích hoạt)
 - Bản dùng thử: chỉ cấp Cơ bản với 10 từ đầu; cấp Trung bình/Nâng cao và nhập từ riêng bị khoá.
 - Khách mở `admin.html`, lấy **Mã máy**, thanh toán, rồi nhận **mã kích hoạt** riêng cho máy đó.
-- Người bán tạo mã bằng `tools/tao-ma/index.html` (mở bằng localhost/https, chọn file khoá bí mật, dán mã máy).
+- Người bán tạo mã bằng `tools/tao-ma/index.html` (cài được như app trên điện thoại): nạp file khoá bí mật một lần, đặt mật khẩu để lưu khoá (mã hoá AES-GCM) trên thiết bị, lần sau chỉ nhập mật khẩu + dán mã máy.
 - Khoá bí mật tạo bằng `node tools/tao-khoa.mjs <file>`; **không commit** file này. Khoá công khai nằm ở `game/license-key.js`.
 - Điền thông tin giá/Zalo/ngân hàng trong `game/config.js`.
