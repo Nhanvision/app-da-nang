@@ -271,6 +271,7 @@ $('btnAdmin').onclick = () => {
   $('menu').hidden = true; $('admin').hidden = false; $('pinMsg').textContent = '';
   $('pinHelp').textContent = store.get('pin', '') ? 'Nhập mã PIN của Admin.' : 'Lần đầu: đặt mã PIN 4–8 số để con không vào sửa từ được.';
   $('pinIn').value = '';
+  $('pinForgot').hidden = !store.get('pin', '');
   showAdmin('pinBox'); $('pinIn').focus();
 };
 $('pinOk').onclick = () => {
@@ -280,6 +281,11 @@ $('pinOk').onclick = () => {
     store.set('pin', v);
   } else if (v !== cur) return $('pinMsg').textContent = 'Sai mã PIN.';
   showAdmin('admBox'); renderAdmin();
+};
+$('pinForgot').onclick = () => {
+  if (!confirm('Đặt lại mã PIN sẽ XOÁ toàn bộ từ vựng riêng đã nhập. Tiếp tục?')) return;
+  ['pin', 'custom', 'only'].forEach(k => { try { localStorage.removeItem('oceanvocab-' + k); } catch (e) {} });
+  $('btnAdmin').click();
 };
 $('pinIn').onkeydown = e => { if (e.key === 'Enter') $('pinOk').click(); };
 $('admClose').onclick = $('pinCancel').onclick = () => { $('admin').hidden = true; showMenu(); };
