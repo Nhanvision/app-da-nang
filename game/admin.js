@@ -72,12 +72,19 @@ function renderLic() {
   $('licStatus').innerHTML = LIC.ok ? '✅ <b>Đã kích hoạt bản đầy đủ</b> trên thiết bị này.' : '🎁 Đang dùng bản dùng thử (chỉ cấp Cơ bản, ' + TRIAL_WORDS + ' từ).';
   $('licForm').hidden = LIC.ok;
   $('admWords').hidden = !LIC.ok;
-  $('devId').textContent = fmtDeviceId(getDeviceId());
+  $('devId').textContent = $('devId0').textContent = fmtDeviceId(getDeviceId());
+  $('devPre').hidden = LIC.ok;
   const s = [SHOP.price && 'Giá: ' + SHOP.price, SHOP.zalo && 'Zalo: ' + SHOP.zalo, SHOP.bank && 'Chuyển khoản: ' + SHOP.bank, SHOP.note].filter(Boolean);
   $('shopInfo').innerHTML = s.map(t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;')).join('<br>');
   if (LIC.ok) renderAdmin();
 }
-$('devCopy').onclick = () => navigator.clipboard.writeText(fmtDeviceId(getDeviceId())).then(() => $('licMsg').textContent = 'Đã sao chép mã máy.', () => $('licMsg').textContent = 'Không sao chép được, hãy bôi đen và copy thủ công.');
+function copyDeviceId(btn) {
+  const old = btn.textContent;
+  navigator.clipboard.writeText(fmtDeviceId(getDeviceId())).then(() => btn.textContent = '✔ Đã chép', () => btn.textContent = 'Hãy bôi đen và copy');
+  setTimeout(() => btn.textContent = old, 2000);
+}
+$('devCopy').onclick = () => copyDeviceId($('devCopy'));
+$('devCopy0').onclick = () => copyDeviceId($('devCopy0'));
 $('licGo').onclick = async () => {
   if (!crypto.subtle) return $('licMsg').textContent = 'Trình duyệt chỉ kích hoạt được khi mở bằng https (hoặc localhost).';
   if (await activateCode($('licCode').value)) { $('licMsg').textContent = ''; renderLic(); }
