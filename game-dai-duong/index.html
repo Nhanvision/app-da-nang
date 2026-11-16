@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Đại Dương Từ Vựng</title>
+<meta name="theme-color" content="#0a6ebd">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="sea">
+  <div class="sun"></div>
+  <div class="weed w1"></div><div class="weed w2"></div><div class="weed w3"></div><div class="weed w4"></div>
+  <div class="sand"></div>
+  <div id="bubbles"></div>
+  <div id="fishLayer"></div>
+
+  <!-- MENU -->
+  <section id="menu" class="panel">
+    <h1>🌊 Đại Dương Từ Vựng</h1>
+    <p>Đọc nghĩa tiếng Việt, rồi <b>bấm vào con cá mang đúng từ tiếng Anh</b>!</p>
+    <div class="levels">
+      <button class="lvl" data-lvl="basic"><span>🐠</span><b>Cơ bản</b><small>Từ quen thuộc · cá bơi chậm</small><em id="best-basic"></em></button>
+      <button class="lvl" data-lvl="mid"><span>🐬</span><b>Trung bình</b><small>Từ thông dụng · cá bơi vừa</small><em id="best-mid"></em></button>
+      <button class="lvl" data-lvl="adv"><span>🦈</span><b>Nâng cao</b><small>Từ khó · cá bơi nhanh</small><em id="best-adv"></em></button>
+    </div>
+    <label class="opt"><input type="checkbox" id="optSound" checked> 🔊 Đọc to từ tiếng Anh</label>
+  </section>
+
+  <!-- HUD -->
+  <div id="hud" hidden>
+    <button id="btnQuit" title="Về menu">✕</button>
+    <div id="prompt"><span id="pEmoji"></span><span id="pText"></span></div>
+    <div class="stats"><span id="hearts"></span><span id="score">0</span><span id="progress">1/10</span></div>
+  </div>
+
+  <!-- KẾT QUẢ -->
+  <section id="result" class="panel" hidden>
+    <h2 id="rTitle">Hoàn thành!</h2>
+    <div id="rStars"></div>
+    <p id="rScore"></p>
+    <div id="rWrong"></div>
+    <div class="row">
+      <button id="btnAgain" class="big">Chơi lại</button>
+      <button id="btnMenu" class="big alt">Chọn cấp độ</button>
+    </div>
+  </section>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
