@@ -7,4 +7,6 @@ Game ôn từ vựng tiếng Anh: đọc nghĩa tiếng Việt, **bấm vào con
 - Sau 12 giây chưa chọn, cá đúng sẽ phát sáng gợi ý.
 - Đọc to từ đúng bằng giọng trình duyệt (tắt được); lưu điểm cao nhất từng cấp; cuối ván liệt kê từ cần ôn.
 
+- **Admin** (⚙️ ở menu, có mã PIN): dán danh sách `english - nghĩa` (mỗi dòng một từ; chấp nhận `-`, `=`, `:`, `|`) cho từng cấp; chọn trộn với từ mặc định hoặc chỉ dùng từ riêng (tối thiểu 4 từ). Lưu trên trình duyệt.
+
 Chạy: mở `index.html` hoặc `npx serve .`. Thêm từ: sửa mảng `WORDS` trong `app.js`.

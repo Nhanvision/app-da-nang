@@ -33,7 +33,7 @@ const LEVELS = {
   mid:   { name: 'Trung bình', speed: 100, fish: 6 },
   adv:   { name: 'Nâng cao', speed: 140, fish: 7 }
 };
-const ROUND = 10, LIVES = 3;
+const ROUND = 10, LIVES = 3, MIN_WORDS = 4;
 // [màu sáng, màu đậm] của thân cá
 const COLORS = [['#ff9a3c','#d9480f'],['#ffd43b','#e67700'],['#74c0fc','#1864ab'],['#f783ac','#a61e4d'],
   ['#b197fc','#5f3dc4'],['#69db7c','#2b8a3e'],['#ff8787','#c92a2a'],['#63e6be','#087f5b']];
@@ -106,7 +106,10 @@ function showMenu() {
   $('menu').hidden = false; $('result').hidden = true; $('hud').hidden = true;
   refreshMenu();
 }
-document.querySelectorAll('.lvl').forEach(b => b.onclick = () => startGame(b.dataset.lvl));
+document.querySelectorAll('.lvl').forEach(b => b.onclick = () => {
+  if (getPool(b.dataset.lvl).length < MIN_WORDS) return alert('Cấp độ này cần ít nhất ' + MIN_WORDS + ' từ. Vào Admin để thêm từ hoặc bỏ chế độ "chỉ dùng từ của tôi".');
+  startGame(b.dataset.lvl);
+});
 $('btnQuit').onclick = showMenu;
 $('btnMenu').onclick = showMenu;
 $('btnAgain').onclick = () => startGame(st.lvl);
@@ -114,9 +117,9 @@ $('btnAgain').onclick = () => startGame(st.lvl);
 // ---------- ván chơi ----------
 function startGame(lvl) {
   stopLoop(); clearFish();
-  const pool = shuffle(WORDS[lvl]);
+  const pool = shuffle(getPool(lvl));
   st = {
-    lvl, cfg: LEVELS[lvl], pool, queue: pool.slice(0, ROUND),
+    lvl, cfg: LEVELS[lvl], pool, round: Math.min(ROUND, pool.length), queue: pool.slice(0, ROUND),
     idx: 0, score: 0, lives: LIVES, combo: 0, wrong: [],
     fish: [], target: null, askedAt: 0, missedThis: false, locked: false
   };
@@ -130,11 +133,11 @@ function startGame(lvl) {
 function updateHud() {
   $('hearts').textContent = '❤️'.repeat(st.lives) + '🖤'.repeat(LIVES - st.lives);
   $('score').textContent = st.score;
-  $('progress').textContent = Math.min(st.idx + 1, ROUND) + '/' + ROUND;
+  $('progress').textContent = Math.min(st.idx + 1, st.round) + '/' + st.round;
 }
 
 function nextWord() {
-  if (st.idx >= ROUND) return endGame(true);
+  if (st.idx >= st.round) return endGame(true);
   st.target = st.queue[st.idx];
   st.askedAt = performance.now();
   st.missedThis = false; st.locked = false;
@@ -228,12 +231,91 @@ function endGame(won) {
   $('hud').hidden = true; $('result').hidden = false;
   $('rTitle').textContent = won ? '🎉 Giỏi lắm!' : '😢 Hết mạng rồi!';
   $('rStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
-  $('rScore').innerHTML = `Cấp độ <b>${st.cfg.name}</b> · Đúng <b>${done}/${ROUND}</b> từ · Điểm <b>${st.score}</b>` +
+  $('rScore').innerHTML = `Cấp độ <b>${st.cfg.name}</b> · Đúng <b>${done}/${st.round}</b> từ · Điểm <b>${st.score}</b>` +
     (newBest ? '<br>🏆 Kỷ lục mới!' : '');
   $('rWrong').innerHTML = st.wrong.length
     ? '<b>Các từ cần ôn lại:</b>' + st.wrong.map(w => `<span>${w[0]} = ${w[1]}</span>`).join('')
     : '';
   if (won) speak('Well done!');
+}
+
+// ---------- Admin: từ vựng riêng ----------
+const store = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem('oceanvocab-' + k)) ?? d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('oceanvocab-' + k, JSON.stringify(v)); } catch (e) { alert('Không lưu được dữ liệu trên trình duyệt này.'); } }
+};
+const getCustom = () => Object.assign({ basic: [], mid: [], adv: [] }, store.get('custom', {}));
+const getOnly = () => Object.assign({ basic: false, mid: false, adv: false }, store.get('only', {}));
+function getPool(lvl) {
+  const custom = getCustom()[lvl], seen = new Set(), out = [];
+  for (const w of (getOnly()[lvl] ? custom : [...custom, ...WORDS[lvl]])) {
+    const k = w[0].toLowerCase();
+    if (!seen.has(k)) { seen.add(k); out.push(w); }
+  }
+  return out;
+}
+// "english - nghĩa" mỗi dòng; chấp nhận - – = | : hoặc tab
+function parseWords(text) {
+  const ok = [], bad = [];
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line) continue;
+    const m = line.match(/^(.+?)\s*(?:\t|\s[-–—]\s|[-–—=|:])\s*(.+)$/);
+    if (m && /[A-Za-z]/.test(m[1])) ok.push([m[1].trim(), m[2].trim()]); else bad.push(line);
+  }
+  return { ok, bad };
+}
+let admLvl = 'basic';
+function showAdmin(which) { ['pinBox', 'admBox'].forEach(id => $(id).hidden = id !== which); }
+$('btnAdmin').onclick = () => {
+  $('menu').hidden = true; $('admin').hidden = false; $('pinMsg').textContent = '';
+  $('pinHelp').textContent = store.get('pin', '') ? 'Nhập mã PIN của Admin.' : 'Lần đầu: đặt mã PIN 4–8 số để con không vào sửa từ được.';
+  $('pinIn').value = '';
+  showAdmin('pinBox'); $('pinIn').focus();
+};
+$('pinOk').onclick = () => {
+  const v = $('pinIn').value.trim(), cur = store.get('pin', '');
+  if (!cur) {
+    if (!/^\d{4,8}$/.test(v)) return $('pinMsg').textContent = 'PIN phải gồm 4–8 chữ số.';
+    store.set('pin', v);
+  } else if (v !== cur) return $('pinMsg').textContent = 'Sai mã PIN.';
+  showAdmin('admBox'); renderAdmin();
+};
+$('pinIn').onkeydown = e => { if (e.key === 'Enter') $('pinOk').click(); };
+$('admClose').onclick = $('pinCancel').onclick = () => { $('admin').hidden = true; showMenu(); };
+document.querySelectorAll('.admTab').forEach(b => b.onclick = () => { admLvl = b.dataset.lvl; renderAdmin(); });
+$('admOnly').onchange = e => { const o = getOnly(); o[admLvl] = e.target.checked; store.set('only', o); renderAdmin(); };
+$('admAdd').onclick = () => {
+  const { ok, bad } = parseWords($('admText').value);
+  const c = getCustom(), have = new Set(c[admLvl].map(w => w[0].toLowerCase()));
+  let added = 0;
+  for (const w of ok) { const k = w[0].toLowerCase(); if (!have.has(k)) { have.add(k); c[admLvl].push(w); added++; } }
+  store.set('custom', c);
+  $('admText').value = bad.join('\n');
+  $('admMsg').textContent = `Đã thêm ${added} từ` + (ok.length - added ? `, bỏ qua ${ok.length - added} từ trùng` : '') +
+    (bad.length ? `. ${bad.length} dòng sai định dạng được giữ lại trong ô để anh sửa.` : '.');
+  renderAdmin();
+};
+$('admClear').onclick = () => {
+  const c = getCustom();
+  if (!c[admLvl].length || !confirm('Xoá toàn bộ ' + c[admLvl].length + ' từ riêng của cấp ' + LEVELS[admLvl].name + '?')) return;
+  c[admLvl] = []; store.set('custom', c); renderAdmin();
+};
+function renderAdmin() {
+  document.querySelectorAll('.admTab').forEach(b => b.classList.toggle('on', b.dataset.lvl === admLvl));
+  const list = getCustom()[admLvl], only = getOnly()[admLvl];
+  $('admOnly').checked = only;
+  $('admCount').textContent = `Từ riêng: ${list.length} · Từ mặc định: ${WORDS[admLvl].length}` +
+    (only && list.length < MIN_WORDS ? ' ⚠️ cần ≥ ' + MIN_WORDS + ' từ riêng để chơi' : '');
+  const box = $('admList'); box.innerHTML = '';
+  list.forEach((w, i) => {
+    const s = document.createElement('span');
+    s.textContent = `${w[0]} = ${w[1]} `;
+    const x = document.createElement('button');
+    x.textContent = '✕'; x.title = 'Xoá';
+    x.onclick = () => { const c = getCustom(); c[admLvl].splice(i, 1); store.set('custom', c); renderAdmin(); };
+    s.appendChild(x); box.appendChild(s);
+  });
 }
 
 // ---------- đáy biển: san hô, rong, sao biển ----------

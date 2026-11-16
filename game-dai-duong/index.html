@@ -6,6 +6,7 @@
 <title>Đại Dương Từ Vựng</title>
 <meta name="theme-color" content="#0a6ebd">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="admin.css">
 </head>
 <body>
 <div id="sea">
@@ -26,6 +27,31 @@
       <button class="lvl" data-lvl="adv"><span>🦈</span><b>Nâng cao</b><small>Từ khó · cá bơi nhanh</small><em id="best-adv"></em></button>
     </div>
     <label class="opt"><input type="checkbox" id="optSound" checked> 🔊 Đọc to từ tiếng Anh</label>
+    <div><button id="btnAdmin" class="link">⚙️ Admin · thêm từ vựng riêng</button></div>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="admin" class="panel" hidden>
+    <div id="pinBox">
+      <h2>⚙️ Admin</h2>
+      <p id="pinHelp"></p>
+      <input id="pinIn" type="password" inputmode="numeric" maxlength="8" placeholder="Mã PIN" autocomplete="off">
+      <p id="pinMsg" class="err"></p>
+      <div class="row"><button id="pinOk" class="big">Vào</button><button id="pinCancel" class="big alt">Quay lại</button></div>
+    </div>
+    <div id="admBox" hidden>
+      <h2>⚙️ Từ vựng riêng</h2>
+      <div class="admTabs">
+        <button class="admTab" data-lvl="basic">Cơ bản</button><button class="admTab" data-lvl="mid">Trung bình</button><button class="admTab" data-lvl="adv">Nâng cao</button>
+      </div>
+      <p id="admCount"></p>
+      <label class="opt"><input type="checkbox" id="admOnly"> Chỉ dùng từ của tôi (bỏ từ mặc định)</label>
+      <textarea id="admText" rows="6" placeholder="Mỗi dòng một từ, dạng:&#10;english - nghĩa tiếng Việt&#10;butterfly - con bướm&#10;grandmother = bà nội"></textarea>
+      <div class="row"><button id="admAdd" class="big">Thêm vào danh sách</button></div>
+      <p id="admMsg" class="msg"></p>
+      <div id="admList"></div>
+      <div class="row"><button id="admClear" class="big alt">Xoá hết từ riêng cấp này</button><button id="admClose" class="big">Xong</button></div>
+    </div>
   </section>
 
   <!-- HUD -->
