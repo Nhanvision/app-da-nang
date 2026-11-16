@@ -9,4 +9,4 @@ Game ôn từ vựng tiếng Anh: đọc nghĩa tiếng Việt, **bấm vào con
 
 - **2 trang riêng**: `index.html` cho con chơi (không có lối vào cài đặt) và `admin.html` cho bố mẹ (mã PIN): dán danh sách `english - nghĩa` (mỗi dòng một từ; chấp nhận `-`, `=`, `:`, `|`) cho từng cấp; chọn trộn với từ mặc định hoặc chỉ dùng từ riêng (tối thiểu 4 từ). Lưu trên trình duyệt.
 
-Chạy: mở `index.html` (trang con) hoặc `admin.html` (trang bố mẹ) hoặc `npx serve .`. Thêm từ: sửa mảng `WORDS` trong `app.js`.
+Chạy: mở `index.html` (trang con) hoặc `admin.html` (trang bố mẹ) hoặc `npx serve .`. Thêm từ: sửa mảng `WORDS` trong `data.js`.
