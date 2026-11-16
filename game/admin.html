@@ -24,6 +24,19 @@
     <button id="pinForgot" class="link">Quên mã PIN?</button>
   </div>
   <div id="admBox" hidden>
+    <section id="licBox">
+      <h2>🔑 Kích hoạt bản đầy đủ</h2>
+      <p id="licStatus"></p>
+      <div id="licForm">
+        <p>Mã máy của thiết bị này:</p>
+        <p><code id="devId"></code> <button id="devCopy" class="link">Sao chép</button></p>
+        <textarea id="licCode" rows="3" placeholder="Dán mã kích hoạt vào đây"></textarea>
+        <div class="row"><button id="licGo" class="big">Kích hoạt</button></div>
+        <p id="licMsg" class="msg"></p>
+        <div id="shopInfo" class="hint"></div>
+      </div>
+    </section>
+    <div id="admWords">
     <h2>⚙️ Từ vựng riêng</h2>
     <div class="admTabs">
       <button class="admTab" data-lvl="basic">Cơ bản</button><button class="admTab" data-lvl="mid">Trung bình</button><button class="admTab" data-lvl="adv">Nâng cao</button>
@@ -40,12 +53,17 @@
       <input id="admFile" type="file" accept=".json,application/json" hidden>
     </div>
     <p class="hint">Xuất/nhập cả 3 cấp độ cùng lúc. Nhập file sẽ <b>gộp</b> vào danh sách hiện có, từ trùng được bỏ qua.</p>
+    <div class="row"><button id="admClear" class="big alt">Xoá hết từ riêng cấp này</button></div>
+    </div>
     <div class="row"><button id="admPin" class="link">🔑 Đổi mã PIN</button></div>
-    <div class="row"><button id="admClear" class="big alt">Xoá hết từ riêng cấp này</button><button id="admClose" class="big">Khoá & thoát</button></div>
+    <div class="row"><button id="admClose" class="big">Khoá & thoát</button></div>
   </div>
   <p class="back"><a href="index.html">← Về trang chơi của con</a></p>
 </main>
 <script src="data.js"></script>
+<script src="config.js"></script>
+<script src="license-key.js"></script>
+<script src="license.js"></script>
 <script src="admin.js"></script>
 <script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
 </body>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tạo mã kích hoạt (dành cho người bán)</title>
+<meta name="robots" content="noindex">
+<style>
+body{font-family:system-ui,"Segoe UI",sans-serif;max-width:640px;margin:30px auto;padding:0 16px;color:#0a4a82}
+h1{font-size:22px}label{display:block;margin:14px 0 4px;font-weight:700}
+input,textarea,button{font:inherit;padding:8px;border-radius:10px;border:2px solid #9ec5e6;width:100%;box-sizing:border-box}
+button{background:#0a6ebd;color:#fff;border:0;cursor:pointer;margin-top:10px;font-weight:700}
+textarea{font:13px monospace;word-break:break-all}.msg{margin-top:8px;min-height:1.2em}
+.warn{background:#fff4e5;border-radius:10px;padding:10px;font-size:14px}
+</style>
+</head>
+<body>
+<h1>🔑 Tạo mã kích hoạt</h1>
+<p class="warn">Trang này chạy hoàn toàn trên máy của anh, không gửi gì đi. Khoá bí mật <b>không bao giờ</b> được đưa lên GitHub hay gửi cho ai.</p>
+
+<label>1. Chọn file khoá bí mật (daiduong-private.json)</label>
+<input id="keyFile" type="file" accept=".json,application/json">
+
+<label>2. Dán Mã máy của khách (dạng XXXX-XXXX-XXXX)</label>
+<input id="devId" placeholder="ABCD-EFGH-JKMN" autocomplete="off">
+
+<button id="go">Tạo mã kích hoạt</button>
+<div id="msg" class="msg"></div>
+<textarea id="out" rows="4" readonly placeholder="Mã kích hoạt sẽ hiện ở đây"></textarea>
+<button id="copy">Sao chép mã</button>
+
+<script>
+const $ = id => document.getElementById(id);
+const b64u = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+let privKey = null;
+$('keyFile').onchange = async e => {
+  privKey = null; $('msg').textContent = '';
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const jwk = JSON.parse(await f.text());
+    privKey = await crypto.subtle.importKey('jwk', jwk, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']);
+    $('msg').textContent = '✅ Đã nạp khoá bí mật.';
+  } catch (err) { $('msg').textContent = '❌ File khoá không hợp lệ.'; }
+};
+$('go').onclick = async () => {
+  const id = $('devId').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!privKey) return $('msg').textContent = 'Hãy chọn file khoá bí mật trước.';
+  if (!/^[A-HJ-NP-Z2-9]{12}$/.test(id)) return $('msg').textContent = 'Mã máy phải gồm 12 ký tự (chữ + số, không có 0, 1, O, I).';
+  const sig = new Uint8Array(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, privKey, new TextEncoder().encode('DAIDUONG|v1|' + id)));
+  $('out').value = b64u(sig);
+  $('msg').textContent = '✅ Mã dành riêng cho máy ' + id.match(/.{4}/g).join('-') + '. Gửi mã này cho khách.';
+};
+$('copy').onclick = () => { $('out').select(); navigator.clipboard.writeText($('out').value).then(() => $('msg').textContent = 'Đã sao chép.'); };
+</script>
+</body>
+</html>

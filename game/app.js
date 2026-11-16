@@ -63,8 +63,9 @@ setInterval(() => {
 function refreshMenu() {
   for (const l in LEVELS) {
     const b = loadBest(l);
-    $('best-' + l).textContent = b ? '🏆 Điểm cao nhất: ' + b : 'Chưa chơi';
+    $('best-' + l).textContent = !LIC.ok && l !== 'basic' ? '🔒 Cần kích hoạt bản đầy đủ' : b ? '🏆 Điểm cao nhất: ' + b : 'Chưa chơi';
   }
+  $('licBanner').innerHTML = LIC.ok ? '✅ Bản đầy đủ' : `🎁 Bản dùng thử: cấp Cơ bản, ${TRIAL_WORDS} từ · <a href="admin.html">Kích hoạt (bố mẹ)</a>`;
 }
 function showMenu() {
   stopLoop(); clearFish(); delete $('sea').dataset.lvl;
@@ -72,6 +73,10 @@ function showMenu() {
   refreshMenu();
 }
 document.querySelectorAll('.lvl').forEach(b => b.onclick = () => {
+  if (!LIC.ok && b.dataset.lvl !== 'basic') {
+    if (confirm('🔒 Cấp độ này có trong bản đầy đủ. Nhờ bố mẹ kích hoạt ở trang bố mẹ. Mở trang đó ngay?')) location.href = 'admin.html';
+    return;
+  }
   if (getPool(b.dataset.lvl).length < MIN_WORDS) return alert('Cấp độ này cần ít nhất ' + MIN_WORDS + ' từ. Nhờ bố mẹ vào trang Admin để thêm từ hoặc bỏ chế độ "chỉ dùng từ của tôi".');
   startGame(b.dataset.lvl);
 });
@@ -278,4 +283,4 @@ setInterval(spawnCrosser, 14000);
 buildFloor(); buildBgFish();
 let rzT; addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(buildFloor, 200); });
 
-showMenu();
+licReady.then(showMenu);

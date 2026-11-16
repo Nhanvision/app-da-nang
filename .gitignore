@@ -3,3 +3,6 @@ node_modules/
 Thumbs.db
 *.log
 .claude/
+
+# khoá bí mật ký mã kích hoạt: tuyệt đối không commit
+*private*.json

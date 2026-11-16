@@ -33,7 +33,8 @@ const LEVELS = {
   mid:   { name: 'Trung bình', speed: 100, fish: 6 },
   adv:   { name: 'Nâng cao', speed: 140, fish: 7 }
 };
-const MIN_WORDS = 4;
+const MIN_WORDS = 4, TRIAL_WORDS = 10;
+const LIC = { ok: false };   // true khi đã kích hoạt (xem license.js)
 const $ = id => document.getElementById(id);
 
 const store = {
@@ -43,6 +44,8 @@ const store = {
 const getCustom = () => Object.assign({ basic: [], mid: [], adv: [] }, store.get('custom', {}));
 const getOnly = () => Object.assign({ basic: false, mid: false, adv: false }, store.get('only', {}));
 function getPool(lvl) {
+  // Bản dùng thử: chỉ cấp Cơ bản với TRIAL_WORDS từ mặc định, không dùng từ riêng
+  if (!LIC.ok) return lvl === 'basic' ? WORDS.basic.slice(0, TRIAL_WORDS) : [];
   const custom = getCustom()[lvl], seen = new Set(), out = [];
   for (const w of (getOnly()[lvl] ? custom : [...custom, ...WORDS[lvl]])) {
     const k = w[0].toLowerCase();

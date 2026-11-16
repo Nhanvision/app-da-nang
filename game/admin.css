@@ -20,3 +20,4 @@ body.adminpage{overflow:auto;background:linear-gradient(#e8f3fc,#c9e3f5);min-hei
 .adminpage #admList{max-height:none}
 .back{margin-top:18px;font-size:14px}.back a{color:#0a6ebd}
 .hint{font-size:13px;opacity:.8;margin:6px 0}
+#licBox{border-bottom:2px solid #d8e9f6;margin-bottom:12px;padding-bottom:6px}#licBox h2{margin:0 0 6px}#licCode{width:100%;border-radius:12px;border:2px solid #9ec5e6;padding:8px;font:13px monospace;word-break:break-all}code{background:#e8f3fc;padding:3px 8px;border-radius:8px;font-size:18px;letter-spacing:1px;user-select:all}#licForm[hidden],#admWords[hidden]{display:none}

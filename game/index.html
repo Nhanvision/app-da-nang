@@ -25,6 +25,7 @@
   <section id="menu" class="panel">
     <h1>🌊 Đại Dương Từ Vựng</h1>
     <p>Đọc nghĩa tiếng Việt, rồi <b>bấm vào con cá mang đúng từ tiếng Anh</b>!</p>
+    <p id="licBanner" class="lic"></p>
     <div class="levels">
       <button class="lvl" data-lvl="basic"><span>🐠</span><b>Cơ bản</b><small>Từ quen thuộc · cá bơi chậm</small><em id="best-basic"></em></button>
       <button class="lvl" data-lvl="mid"><span>🐬</span><b>Trung bình</b><small>Từ thông dụng · cá bơi vừa</small><em id="best-mid"></em></button>
@@ -54,6 +55,8 @@
   </section>
 </div>
 <script src="data.js"></script>
+<script src="license-key.js"></script>
+<script src="license.js"></script>
 <script src="app.js"></script>
 <script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
 </body>
