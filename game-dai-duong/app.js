@@ -34,7 +34,35 @@ const LEVELS = {
   adv:   { name: 'Nâng cao', speed: 140, fish: 7 }
 };
 const ROUND = 10, LIVES = 3;
-const COLORS = ['#e8590c','#2b8a3e','#7048e8','#d6336c','#1971c2','#f08c00','#0ca678','#c2255c'];
+// [màu sáng, màu đậm] của thân cá
+const COLORS = [['#ff9a3c','#d9480f'],['#ffd43b','#e67700'],['#74c0fc','#1864ab'],['#f783ac','#a61e4d'],
+  ['#b197fc','#5f3dc4'],['#69db7c','#2b8a3e'],['#ff8787','#c92a2a'],['#63e6be','#087f5b']];
+let uid = 0;
+
+// Vẽ cá bằng SVG (hướng sang phải), rộng W; variant 0: sọc, 1: đốm, 2: trơn
+function fishSVG(W, [c1, c2], variant) {
+  const id = 'f' + (uid++), L = 30, R = W - 2;
+  const body = `M${L},32 C${L+10},-2 ${R-26},-4 ${R},30 C${R-26},66 ${L+10},66 ${L},32Z`;
+  let deco = '';
+  if (variant === 0) deco = [.34, .5, .66].map(p => `<rect x="${W*p}" y="-10" width="${p===.5?9:6}" height="80" fill="#fff" opacity=".55"/>`).join('');
+  if (variant === 1) deco = [[.4,22,5],[.52,40,6],[.62,24,4],[.7,42,4],[.48,26,3]].map(([p,y,r]) => `<circle cx="${W*p}" cy="${y}" r="${r}" fill="${c2}" opacity=".4"/>`).join('');
+  if (variant === 2) deco = `<path d="M${L},20 C${L+20},-4 ${R-26},-6 ${R},26 C${R-30},12 ${L+30},12 ${L},20Z" fill="${c2}" opacity=".45"/>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="78" viewBox="0 -8 ${W} 78">
+<defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c2}"/><stop offset=".45" stop-color="${c1}"/><stop offset="1" stop-color="#fff8e1"/></linearGradient>
+<clipPath id="c${id}"><path d="${body}"/></clipPath></defs>
+<g class="tail"><path d="M${L+4},32 L0,4 Q12,32 0,60 Z" fill="${c2}"/><path d="M${L+4},32 L6,14 M${L+4},32 L6,50" stroke="#fff" stroke-opacity=".35" stroke-width="1.5"/></g>
+<path d="M${W*.34},6 Q${W*.5},-12 ${W*.7},4 Z" fill="${c2}"/>
+<path d="M${W*.42},56 Q${W*.46},74 ${W*.6},58 Z" fill="${c2}"/>
+<path d="${body}" fill="url(#g${id})"/>
+<g clip-path="url(#c${id})">${deco}</g>
+<path d="${body}" fill="none" stroke="${c2}" stroke-width="1.5"/>
+<path d="M${R-30},12 Q${R-24},32 ${R-30},52" fill="none" stroke="${c2}" stroke-width="2" opacity=".6"/>
+<g class="fin"><path d="M${W*.5},38 Q${W*.45},56 ${W*.58},54 Z" fill="${c2}" opacity=".85"/></g>
+<circle cx="${R-14}" cy="24" r="6" fill="#fff"/><circle cx="${R-12}" cy="24" r="3.2" fill="#111"/><circle cx="${R-11}" cy="22.5" r="1" fill="#fff"/>
+<path d="M${R},34 q-5,3 -9,1" fill="none" stroke="${c2}" stroke-width="2" stroke-linecap="round"/>
+</svg>`;
+}
+const fishWidth = word => Math.max(116, Math.round(word.length * 12.5 + 66));
 
 const $ = id => document.getElementById(id);
 const layer = $('fishLayer');
@@ -125,23 +153,20 @@ function spawnFish(w, i, n) {
   const el = document.createElement('div');
   const dir = Math.random() < 0.5 ? 1 : -1;       // 1: bơi sang phải
   el.className = 'fish ' + (dir > 0 ? 'right' : 'left');
-  const body = document.createElement('div');
-  body.className = 'body';
-  body.textContent = w[0];
+  const W = fishWidth(w[0]);
   const color = COLORS[(Math.random() * COLORS.length) | 0];
-  body.style.setProperty('--c', color);
-  el.appendChild(body);
+  el.innerHTML = `<div class="in">${fishSVG(W, color, (Math.random() * 3) | 0)}<span class="lbl">${w[0]}</span></div>`;
+  el.style.width = W + 'px'; el.style.height = '78px';
   layer.appendChild(el);
 
-  const W = layer.clientWidth, H = layer.clientHeight;
-  const top = 90, bottom = 90;
+  const LW = layer.clientWidth, H = layer.clientHeight;
+  const top = 80, bottom = 130;
   const laneH = (H - top - bottom) / n;
   const f = {
-    el, word: w, dir,
-    w: el.offsetWidth, h: el.offsetHeight,
-    x: rand(0, Math.max(10, W - 140)),
-    baseY: top + laneH * i + laneH / 2 - el.offsetHeight / 2,
-    amp: rand(6, 18), ph: rand(0, 6.28),
+    el, word: w, dir, w: W, h: 78,
+    x: rand(0, Math.max(10, LW - W)),
+    baseY: top + laneH * i + laneH / 2 - 39,
+    amp: Math.min(10, laneH / 4), ph: rand(0, 6.28),
     v: st.cfg.speed * rand(0.8, 1.25)
   };
   el.onclick = () => onPick(f);
@@ -209,5 +234,52 @@ function endGame(won) {
     : '';
   if (won) speak('Well done!');
 }
+
+// ---------- đáy biển: san hô, rong, sao biển ----------
+function buildFloor() {
+  const svg = $('floor'), W = innerWidth, G = 170;
+  svg.setAttribute('viewBox', `0 0 ${W} ${G}`);
+  const sw = (x, h, c, wd) => `<path class="sway" style="animation-delay:${-rand(0, 3).toFixed(1)}s" d="M${x},${G} C${x-18},${G-h*.35} ${x+18},${G-h*.65} ${x},${G-h}" fill="none" stroke="${c}" stroke-width="${wd}" stroke-linecap="round"/>`;
+  const branch = (x, h, c) => {
+    let o = `<g stroke="${c}" stroke-width="9" stroke-linecap="round" fill="none"><path d="M${x},${G} L${x},${G-h}"/>`;
+    for (let k = 1; k <= 3; k++) { const y = G - h * k / 4, d = 16 + k * 4; o += `<path d="M${x},${y+8} L${x-d},${y-14}"/><path d="M${x},${y-4} L${x+d},${y-24}"/>`; }
+    return o + '</g>';
+  };
+  const fan = (x, r, c) => {
+    let o = `<g stroke="${c}" stroke-width="4" stroke-linecap="round" fill="none">`; const pts = [];
+    for (let a = -70; a <= 70; a += 14) { const t = a * Math.PI / 180, px = x + Math.sin(t) * r, py = G - Math.cos(t) * r; pts.push(px.toFixed(1) + ',' + py.toFixed(1)); o += `<path d="M${x},${G} L${px},${py}"/>`; }
+    return o + `<polyline points="${pts.join(' ')}" stroke-width="3"/></g>`;
+  };
+  const brain = (x, r, c, d) => `<path d="M${x-r},${G} A${r},${r*.8} 0 0 1 ${x+r},${G}Z" fill="${c}"/><g fill="none" stroke="${d}" stroke-width="2.5" stroke-linecap="round" opacity=".6"><path d="M${x-r*.6},${G-6} q${r*.15},-${r*.5} ${r*.3},-${r*.1} t${r*.3},-${r*.1}"/><path d="M${x-r*.2},${G-r*.6} q${r*.2},${r*.15} ${r*.35},0"/><path d="M${x+r*.1},${G-8} q${r*.2},-${r*.4} ${r*.4},-${r*.05}"/></g>`;
+  const tube = (x, h, c, d) => [[0, h], [16, h * .7], [-14, h * .55]].map(([dx, hh]) => `<rect x="${x+dx-6}" y="${G-hh}" width="12" height="${hh}" rx="5" fill="${c}"/><ellipse cx="${x+dx}" cy="${G-hh}" rx="6" ry="3" fill="${d}"/>`).join('');
+  const star = (x, y, c) => { const p = []; for (let k = 0; k < 10; k++) { const r = k % 2 ? 5 : 12, t = (k * 36 - 90) * Math.PI / 180; p.push((x + Math.cos(t) * r).toFixed(1) + ',' + (y + Math.sin(t) * r).toFixed(1)); } return `<polygon points="${p.join(' ')}" fill="${c}" stroke="#fff" stroke-opacity=".4"/>`; };
+  const pick = a => a[(Math.random() * a.length) | 0];
+
+  let back = '', front = '';
+  for (let x = 10; x < W; x += rand(28, 55)) {
+    const k = Math.random();
+    if (k < .34) back += sw(x, rand(60, 130), pick(['#2e9e5b', '#37b26c', '#1f8a4c']), rand(6, 9)) + sw(x + 9, rand(40, 90), pick(['#52c07a', '#2e9e5b']), 6);
+    else if (k < .52) back += branch(x, rand(55, 95), pick(['#ff6b6b', '#ff8787', '#f06595']));
+    else if (k < .66) back += fan(x, rand(40, 70), pick(['#b197fc', '#da77f2', '#9775fa']));
+    else if (k < .80) back += brain(x, rand(22, 36), pick(['#f783ac', '#ffa94d', '#e599f7']), '#5c1a3a');
+    else back += tube(x, rand(40, 70), pick(['#ffa94d', '#fcc419', '#ff922b']), '#7a3b00');
+  }
+  front += `<path d="M0,${G} L0,${G-22} Q${W*.25},${G-34} ${W*.5},${G-22} T${W},${G-24} L${W},${G}Z" fill="#e8cf8c"/><path d="M0,${G-22} Q${W*.25},${G-34} ${W*.5},${G-22} T${W},${G-24}" fill="none" stroke="#f6e6b4" stroke-width="4"/>`;
+  for (let x = 30; x < W; x += rand(90, 200)) front += star(x, G - rand(4, 14), pick(['#ff7043', '#ffb300']));
+  for (let x = 60; x < W; x += rand(120, 240)) front += `<ellipse cx="${x}" cy="${G-6}" rx="${rand(10, 20)}" ry="${rand(6, 10)}" fill="#8d99a6"/>`;
+  svg.innerHTML = back + front;
+}
+function buildBgFish() {
+  const box = $('bgFish');
+  for (let k = 0; k < 5; k++) {
+    const d = document.createElement('div');
+    d.className = 'bf' + (k % 2 ? ' l' : '');
+    d.style.cssText = `top:${rand(12, 60)}%;animation-duration:${rand(28, 50)}s;animation-delay:-${rand(0, 30)}s`;
+    d.innerHTML = fishSVG(100, COLORS[(Math.random() * COLORS.length) | 0], k % 3).replace('width="100" height="78"', 'width="70" height="55"');
+    box.appendChild(d);
+  }
+}
+buildFloor(); buildBgFish();
+let rzT; addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(buildFloor, 200); });
 
 showMenu();
