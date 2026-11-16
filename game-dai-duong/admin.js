@@ -68,3 +68,41 @@ function renderAdmin() {
 
 
 openPin();
+
+// ---------- Xuất / nhập file ----------
+$('admExport').onclick = () => {
+  const data = { app: 'oceanvocab', version: 1, exportedAt: new Date().toISOString(), custom: getCustom(), only: getOnly() };
+  const total = Object.values(data.custom).reduce((n, l) => n + l.length, 0);
+  if (!total) return $('admMsg').textContent = 'Chưa có từ riêng nào để xuất.';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+  a.download = 'tu-vung-dai-duong-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  $('admMsg').textContent = `Đã xuất ${total} từ.`;
+};
+$('admImport').onclick = () => $('admFile').click();
+$('admFile').onchange = async e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  let data;
+  try { data = JSON.parse(await file.text()); } catch (err) { return $('admMsg').textContent = 'File không đọc được (không phải JSON).'; }
+  if (!data || data.app !== 'oceanvocab' || typeof data.custom !== 'object') return $('admMsg').textContent = 'Đây không phải file từ vựng của game này.';
+  const c = getCustom(), o = getOnly();
+  let added = 0, skipped = 0;
+  for (const lvl of Object.keys(LEVELS)) {
+    const list = Array.isArray(data.custom[lvl]) ? data.custom[lvl] : [];
+    const have = new Set(c[lvl].map(w => w[0].toLowerCase()));
+    for (const w of list) {
+      if (!Array.isArray(w) || typeof w[0] !== 'string' || typeof w[1] !== 'string' || !w[0].trim() || !w[1].trim()) { skipped++; continue; }
+      const k = w[0].trim().toLowerCase();
+      if (have.has(k)) { skipped++; continue; }
+      have.add(k); c[lvl].push([w[0].trim(), w[1].trim()]); added++;
+    }
+    if (data.only && data.only[lvl] === true) o[lvl] = true;
+  }
+  store.set('custom', c); store.set('only', o);
+  $('admMsg').textContent = `Đã nhập ${added} từ` + (skipped ? `, bỏ qua ${skipped} từ trùng/không hợp lệ.` : '.');
+  renderAdmin();
+};

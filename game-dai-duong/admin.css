@@ -19,3 +19,4 @@ body.adminpage{overflow:auto;background:linear-gradient(#e8f3fc,#c9e3f5);min-hei
 .adminpage .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px}
 .adminpage #admList{max-height:none}
 .back{margin-top:18px;font-size:14px}.back a{color:#0a6ebd}
+.hint{font-size:13px;opacity:.8;margin:6px 0}

@@ -29,6 +29,12 @@
     <div class="row"><button id="admAdd" class="big">Thêm vào danh sách</button></div>
     <p id="admMsg" class="msg"></p>
     <div id="admList"></div>
+    <div class="row">
+      <button id="admExport" class="big alt">⬇️ Xuất file</button>
+      <button id="admImport" class="big alt">⬆️ Nhập file</button>
+      <input id="admFile" type="file" accept=".json,application/json" hidden>
+    </div>
+    <p class="hint">Xuất/nhập cả 3 cấp độ cùng lúc. Nhập file sẽ <b>gộp</b> vào danh sách hiện có, từ trùng được bỏ qua.</p>
     <div class="row"><button id="admPin" class="link">🔑 Đổi mã PIN</button></div>
     <div class="row"><button id="admClear" class="big alt">Xoá hết từ riêng cấp này</button><button id="admClose" class="big">Khoá & thoát</button></div>
   </div>
