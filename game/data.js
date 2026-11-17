@@ -70,9 +70,9 @@ WORDS.adv.push(
   ['vulnerable','dễ bị tổn thương']
 );
 
-// speed: px/giây, fish: số cá cùng lúc. Mọi cấp bơi cùng tốc độ; cấp cao hơn khó ở từ vựng.
+// speed: px/giây, fish: số cá cùng lúc. Cơ bản bơi chậm cho bé nhỏ; Trung bình và Nâng cao bơi cùng tốc độ, khó hơn ở từ vựng.
 const LEVELS = {
-  basic: { name: 'Cơ bản', speed: 80, fish: 6 },
+  basic: { name: 'Cơ bản', speed: 50, fish: 6 },
   mid:   { name: 'Trung bình', speed: 80, fish: 6 },
   adv:   { name: 'Nâng cao', speed: 80, fish: 6 }
 };
