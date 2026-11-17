@@ -29,9 +29,11 @@
     <div class="tabs">
       <button class="tab on" data-mode="play">🎮 Chơi game</button>
       <button class="tab" data-mode="study">📖 Học từ vựng</button>
+      <button class="tab" data-mode="board">🏆 Bảng điểm</button>
     </div>
     <p id="modeHelp" class="hint2"></p>
-    <div class="levels">
+    <div id="boardBox" hidden></div>
+    <div class="levels" id="levelsBox">
       <button class="lvl" data-lvl="basic"><span>🐠</span><b>Cơ bản</b><small>Từ quen thuộc, có hình minh hoạ</small><i id="cnt-basic"></i><em id="best-basic"></em></button>
       <button class="lvl" data-lvl="mid"><span>🐬</span><b>Trung bình</b><small>Từ thông dụng, dài hơn</small><i id="cnt-mid"></i><em id="best-mid"></em></button>
       <button class="lvl" data-lvl="adv"><span>🦈</span><b>Nâng cao</b><small>Từ khó, dễ nhầm</small><i id="cnt-adv"></i><em id="best-adv"></em></button>
@@ -73,6 +75,11 @@
     <h2 id="rTitle">Hoàn thành!</h2>
     <div id="rStars"></div>
     <p id="rScore"></p>
+    <div id="nameRow" hidden>
+      <p><b>🏆 Điểm của con vào bảng điểm cao!</b></p>
+      <div class="nameBox"><input id="playerName" maxlength="14" placeholder="Tên của con" autocomplete="off"><button id="saveScore" class="big">Lưu</button></div>
+    </div>
+    <p id="savedMsg" class="msg2"></p>
     <div id="rWrong"></div>
     <div class="row">
       <button id="btnAgain" class="big">Chơi lại</button>

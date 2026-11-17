@@ -75,7 +75,7 @@ function renderLic() {
   $('devId').textContent = $('devId0').textContent = fmtDeviceId(getDeviceId());
   $('devPre').hidden = LIC.ok;
   const s = [SHOP.price && 'Giá: ' + SHOP.price, SHOP.zalo && 'Zalo: ' + SHOP.zalo, SHOP.bank && 'Chuyển khoản: ' + SHOP.bank, SHOP.note].filter(Boolean);
-  $('shopInfo').innerHTML = s.map(t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;')).join('<br>');
+  $('shopInfo').innerHTML = s.map(t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;')).join('<br>') + '<br><a href="gioi-thieu.html#mua">Xem mã QR chuyển khoản</a>';
   if (LIC.ok) renderAdmin();
 }
 function copyDeviceId(btn) {
@@ -129,4 +129,10 @@ $('admFile').onchange = async e => {
   store.set('custom', c); store.set('only', o);
   $('admMsg').textContent = `Đã nhập ${added} từ` + (skipped ? `, bỏ qua ${skipped} từ trùng/không hợp lệ.` : '.');
   renderAdmin();
+};
+
+$('admBoardClear').onclick = () => {
+  if (!confirm('Xoá toàn bộ bảng điểm cao của cả 3 cấp độ trên thiết bị này?')) return;
+  try { localStorage.removeItem('oceanvocab-board'); } catch (e) {}
+  $('licMsg').textContent = ''; alert('Đã xoá bảng điểm.');
 };

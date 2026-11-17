@@ -70,15 +70,46 @@ function refreshMenu() {
     $('cnt-' + l).textContent = locked ? `📚 ${c.full} từ trong bản đầy đủ`
       : `📚 ${c.total} từ` + (c.added ? ` (có ${c.added} từ bố mẹ thêm)` : '');
   }
-  $('modeHelp').textContent = menuMode === 'play' ? 'Chọn cấp độ để chơi:' : 'Chọn cấp độ để học các từ trước khi chơi:';
+  $('modeHelp').textContent = { play: 'Chọn cấp độ để chơi:', study: 'Chọn cấp độ để học các từ trước khi chơi:', board: 'Top 10 điểm cao nhất của từng cấp độ:' }[menuMode];
+  $('levelsBox').hidden = menuMode === 'board';
+  $('boardBox').hidden = menuMode !== 'board';
+  if (menuMode === 'board') renderBoard();
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.mode === menuMode));
-  $('licBanner').innerHTML = LIC.ok ? '✅ Bản đầy đủ' : `🎁 Bản dùng thử: cấp Cơ bản, ${TRIAL_WORDS} từ · <a href="admin.html">Kích hoạt (bố mẹ)</a>`;
+  $('licBanner').innerHTML = LIC.ok ? '✅ Bản đầy đủ' : `🎁 Bản dùng thử: cấp Cơ bản, ${TRIAL_WORDS} từ · <a href="gioi-thieu.html">Xem giá & mua</a> · <a href="admin.html">Kích hoạt (bố mẹ)</a>`;
 }
 function showMenu() {
   if (st) clearTimeout(st.nextT);   // huỷ bước chuyển từ đang chờ nếu thoát giữa chừng
   stopLoop(); clearFish(); delete $('sea').dataset.lvl;
   $('menu').hidden = false; $('result').hidden = true; $('hud').hidden = true; $('study').hidden = true;
   refreshMenu();
+}
+
+function renderBoard() {
+  const b = getBoard(), box = $('boardBox');
+  box.innerHTML = '';
+  for (const l in LEVELS) {
+    const sec = document.createElement('div');
+    sec.className = 'boardSec';
+    const h = document.createElement('h3');
+    h.textContent = LEVELS[l].name;
+    sec.appendChild(h);
+    if (!b[l].length) {
+      const p = document.createElement('p');
+      p.className = 'hint2';
+      p.textContent = !LIC.ok && l !== 'basic' ? '🔒 Có trong bản đầy đủ' : 'Chưa có điểm nào. Chơi để lên bảng nhé!';
+      sec.appendChild(p);
+    }
+    b[l].forEach((e, i) => {
+      const r = document.createElement('div');
+      r.className = 'boardRow';
+      const [rank, name, date, score] = [document.createElement('span'), document.createElement('b'), document.createElement('i'), document.createElement('em')];
+      rank.textContent = ['🥇', '🥈', '🥉'][i] || (i + 1) + '.';
+      name.textContent = e.n; date.textContent = e.d.split('-').reverse().join('/'); score.textContent = e.s;
+      r.append(rank, name, date, score);
+      sec.appendChild(r);
+    });
+    box.appendChild(sec);
+  }
 }
 
 // ---------- học từ vựng (thẻ nhớ) ----------
@@ -278,8 +309,21 @@ function endGame(won) {
   $('rWrong').innerHTML = st.wrong.length
     ? '<b>Các từ cần ôn lại:</b>' + st.wrong.map(w => `<span>${w[0]} = ${w[1]}</span>`).join('')
     : '';
+  $('savedMsg').textContent = '';
+  const canSave = qualifies(st.lvl, st.score);
+  $('nameRow').hidden = !canSave;
+  if (canSave) { $('playerName').value = store.get('lastName', ''); st.saved = false; }
   if (won) speak('Well done!');
 }
+function saveScoreNow() {
+  if (!st || st.saved || !qualifies(st.lvl, st.score)) return;
+  addScore(st.lvl, $('playerName').value, st.score);
+  st.saved = true;
+  $('nameRow').hidden = true;
+  $('savedMsg').textContent = '✅ Đã lưu vào bảng điểm!';
+}
+$('saveScore').onclick = saveScoreNow;
+$('playerName').onkeydown = e => { if (e.key === 'Enter') saveScoreNow(); };
 
 // ---------- đáy biển: san hô, rong, sao biển ----------
 function buildFloor() {

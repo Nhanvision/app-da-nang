@@ -27,6 +27,49 @@ const WORDS = {
   ]
 };
 
+// ---- Bộ từ mở rộng (thêm sau 30 từ đầu; 10 từ đầu của Cơ bản dành cho bản dùng thử) ----
+WORDS.basic.push(
+  ['lion','sư tử','🦁'],['tiger','con hổ','🐯'],['elephant','con voi','🐘'],['monkey','con khỉ','🐵'],['rabbit','con thỏ','🐰'],
+  ['horse','con ngựa','🐴'],['cow','con bò','🐮'],['pig','con heo','🐷'],['duck','con vịt','🦆'],['chicken','con gà','🐔'],
+  ['frog','con ếch','🐸'],['snake','con rắn','🐍'],['bear','con gấu','🐻'],['turtle','con rùa','🐢'],['butterfly','con bướm','🦋'],
+  ['bee','con ong','🐝'],['whale','cá voi','🐳'],['shark','cá mập','🦈'],['crab','con cua','🦀'],['orange','quả cam','🍊'],
+  ['grape','quả nho','🍇'],['strawberry','quả dâu tây','🍓'],['watermelon','dưa hấu','🍉'],['pineapple','quả dứa','🍍'],['carrot','cà rốt','🥕'],
+  ['tomato','cà chua','🍅'],['potato','khoai tây','🥔'],['rice','cơm, gạo','🍚'],['cake','bánh ngọt','🍰'],['pizza','bánh pizza','🍕'],
+  ['coffee','cà phê','☕'],['ice cream','kem','🍦'],['cheese','phô mai','🧀'],['green','màu xanh lá','🟢'],['yellow','màu vàng','🟡'],
+  ['black','màu đen','⚫'],['white','màu trắng','⚪'],['heart','trái tim','❤️'],['bed','cái giường','🛏️'],['chair','cái ghế','🪑'],
+  ['door','cánh cửa','🚪'],['clock','đồng hồ','🕒'],['phone','điện thoại','📱'],['key','chìa khoá','🔑'],['bag','cái cặp','🎒'],
+  ['shoe','chiếc giày','👟'],['shirt','cái áo','👕'],['glasses','kính mắt','👓'],['fire','ngọn lửa','🔥'],['snow','tuyết','❄️'],
+  ['cloud','đám mây','☁️'],['boat','con thuyền','⛵'],['train','tàu hoả','🚆'],['plane','máy bay','✈️'],['bike','xe đạp','🚲'],
+  ['school','trường học','🏫'],['music','âm nhạc','🎵'],['sad','buồn','😢'],['angry','giận dữ','😠'],['sleep','ngủ','😴']
+);
+WORDS.mid.push(
+  ['morning','buổi sáng'],['evening','buổi tối'],['weekend','cuối tuần'],['airport','sân bay'],['station','nhà ga'],
+  ['restaurant','nhà hàng'],['supermarket','siêu thị'],['bakery','tiệm bánh'],['museum','bảo tàng'],['farmer','nông dân'],
+  ['engineer','kỹ sư'],['nurse','y tá'],['dentist','nha sĩ'],['pilot','phi công'],['police','cảnh sát'],
+  ['customer','khách hàng'],['passenger','hành khách'],['dictionary','từ điển'],['newspaper','tờ báo'],['message','tin nhắn'],
+  ['address','địa chỉ'],['password','mật khẩu'],['question','câu hỏi'],['answer','câu trả lời'],['problem','vấn đề'],
+  ['solution','giải pháp'],['accident','tai nạn'],['exercise','bài tập, tập thể dục'],['health','sức khoẻ'],['medicine','thuốc'],
+  ['headache','đau đầu'],['hungry','đói'],['thirsty','khát nước'],['nervous','lo lắng'],
+  ['excited','hào hứng'],['careful','cẩn thận'],['popular','phổ biến'],['ancient','cổ xưa'],['modern','hiện đại'],
+  ['narrow','hẹp'],['heavy','nặng'],['invite','mời'],['arrive','đến nơi'],['decide','quyết định'],
+  ['receive','nhận được'],['explain','giải thích'],['remember','nhớ'],['repeat','lặp lại'],['practice','luyện tập'],
+  ['describe','mô tả'],['suddenly','đột nhiên'],['usually','thường xuyên'],['finally','cuối cùng'],['together','cùng nhau'],
+  ['perhaps','có lẽ'],['between','ở giữa']
+);
+WORDS.adv.push(
+  ['abandon','từ bỏ'],['absorb','hấp thụ'],['abundant','dồi dào'],['accurate','chính xác'],['acquire','thu được'],
+  ['adapt','thích nghi'],['adequate','đầy đủ, thích đáng'],['ambiguous','mơ hồ'],['anticipate','dự đoán, mong đợi'],['apparent','rõ ràng'],
+  ['appreciate','trân trọng'],['arrogant','kiêu ngạo'],['authentic','chính hiệu, xác thực'],['benefit','lợi ích'],['bias','sự thiên vị'],
+  ['capable','có khả năng'],['cautious','thận trọng'],['circumstance','hoàn cảnh'],['coincidence','sự trùng hợp'],['collaborate','cộng tác'],
+  ['compassion','lòng trắc ẩn'],['complicated','phức tạp'],['consequence','hậu quả'],['controversy','sự tranh cãi'],['convenient','thuận tiện'],
+  ['courage','lòng can đảm'],['criticize','chỉ trích'],['deadline','hạn chót'],['determine','xác định'],['dilemma','tình thế khó xử'],
+  ['diverse','đa dạng'],['efficient','hiệu quả'],['eliminate','loại bỏ'],['emphasize','nhấn mạnh'],['endure','chịu đựng'],
+  ['enormous','khổng lồ'],['essential','thiết yếu'],['evaluate','đánh giá'],['evidence','bằng chứng'],['exaggerate','phóng đại'],
+  ['fundamental','cơ bản, nền tảng'],['hesitate','do dự'],['humble','khiêm tốn'],['immediate','ngay lập tức'],['impatient','thiếu kiên nhẫn'],
+  ['inspire','truyền cảm hứng'],['obstacle','trở ngại'],['persuade','thuyết phục'],['priority','sự ưu tiên'],['sufficient','đủ'],
+  ['vulnerable','dễ bị tổn thương']
+);
+
 // speed: px/giây, fish: số cá cùng lúc. Mọi cấp bơi cùng tốc độ; cấp cao hơn khó ở từ vựng.
 const LEVELS = {
   basic: { name: 'Cơ bản', speed: 80, fish: 6 },
@@ -70,4 +113,17 @@ function parseWords(text) {
     if (m && /[A-Za-z]/.test(m[1])) ok.push([m[1].trim(), m[2].trim()]); else bad.push(line);
   }
   return { ok, bad };
+}
+
+// ---- Bảng điểm cao (lưu trên thiết bị, top 10 mỗi cấp) ----
+const BOARD_SIZE = 10;
+const getBoard = () => Object.assign({ basic: [], mid: [], adv: [] }, store.get('board', {}));
+const qualifies = (lvl, score) => score > 0 && (getBoard()[lvl].length < BOARD_SIZE || score > getBoard()[lvl][BOARD_SIZE - 1].s);
+function addScore(lvl, name, score) {
+  const b = getBoard();
+  b[lvl].push({ n: String(name).trim().slice(0, 14) || 'Bé', s: score, d: new Date().toISOString().slice(0, 10) });
+  b[lvl].sort((x, y) => y.s - x.s);
+  b[lvl] = b[lvl].slice(0, BOARD_SIZE);
+  store.set('board', b);
+  store.set('lastName', b[lvl].find(e => e.s === score).n);
 }

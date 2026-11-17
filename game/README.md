@@ -5,6 +5,8 @@ Game ôn từ vựng tiếng Anh: đọc nghĩa tiếng Việt, **bấm vào con
 - 3 cấp độ: Cơ bản (từ có hình emoji), Trung bình, Nâng cao (từ khó, dễ nhầm).
 - Mỗi ván 10 từ, 3 mạng ❤️; chọn sai mất mạng. **Điểm theo thời gian**: đúng được 10 điểm + thưởng tốc độ tới 10 điểm (giảm dần về 0 sau 8 giây, có thanh thời gian), cộng thêm thưởng chuỗi đúng liên tiếp.
 - Mọi cấp độ cá bơi cùng tốc độ; cấp cao hơn khó ở từ vựng.
+- **Bảng điểm cao** (top 10 mỗi cấp, bé nhập tên; bố mẹ xoá được ở trang Admin). Hơn 250 từ mặc định.
+- Trang giới thiệu bán hàng `gioi-thieu.html` có mã QR chuyển khoản VietQR tự điền số tiền + nội dung (Mã máy); cấu hình ở `config.js`.
 - Tab **Học từ vựng**: thẻ nhớ (bấm để lật nghĩa, nghe phát âm) và danh sách từ trước khi chơi. Menu hiện số từ của từng cấp, gồm cả từ bố mẹ thêm.
 - Sau 12 giây chưa chọn, cá đúng sẽ phát sáng gợi ý.
 - Đọc to từ đúng bằng giọng trình duyệt (tắt được); lưu điểm cao nhất từng cấp; cuối ván liệt kê từ cần ôn.

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đại Dương Từ Vựng – Game học tiếng Anh cho bé</title>
+<meta name="description" content="Game học từ vựng tiếng Anh cho bé: bấm đúng con cá mang từ cần tìm. Dùng thử miễn phí, mở khoá trọn đời bằng mã kích hoạt.">
+<meta name="theme-color" content="#0a6ebd">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="landing.css">
+</head>
+<body>
+<header class="hero">
+  <img src="icon-192.png" alt="Biểu tượng Đại Dương Từ Vựng" width="96" height="96">
+  <h1>Đại Dương Từ Vựng</h1>
+  <p class="sub">Game học từ vựng tiếng Anh cho bé: <b>bấm thật nhanh vào con cá mang đúng từ</b> đang bơi dưới đại dương.</p>
+  <div class="cta">
+    <a class="btn" href="index.html">🎮 Chơi thử miễn phí</a>
+    <a class="btn alt" href="#mua">🔑 Mở khoá bản đầy đủ</a>
+  </div>
+</header>
+
+<main>
+  <section class="grid">
+    <div class="feat"><span>🐠</span><b>Chơi mà học</b><p>Đọc nghĩa tiếng Việt, tìm đúng từ tiếng Anh trong đàn cá. Càng nhanh điểm càng cao.</p></div>
+    <div class="feat"><span>📖</span><b>Học trước khi chơi</b><p>Thẻ nhớ có hình minh hoạ và phát âm chuẩn, bé nghe và lật thẻ trước khi vào game.</p></div>
+    <div class="feat"><span>📚</span><b>3 cấp độ, hơn 250 từ</b><p>Cơ bản, Trung bình, Nâng cao. Bố mẹ còn tự thêm từ theo bài học ở trường của bé.</p></div>
+    <div class="feat"><span>🏆</span><b>Bảng điểm cao</b><p>Bé lưu tên, thi đua phá kỷ lục của chính mình mỗi ngày.</p></div>
+    <div class="feat"><span>📱</span><b>Cài như app, chơi offline</b><p>Thêm vào màn hình chính điện thoại, không cần mạng vẫn chơi được.</p></div>
+    <div class="feat"><span>🔒</span><b>An toàn cho trẻ</b><p>Không quảng cáo, không thu thập dữ liệu. Phần cài đặt của bố mẹ có mã PIN riêng.</p></div>
+  </section>
+
+  <section class="card">
+    <h2>Bản dùng thử và bản đầy đủ</h2>
+    <table>
+      <tr><th></th><th>Dùng thử</th><th>Bản đầy đủ</th></tr>
+      <tr><td>Cấp Cơ bản</td><td>10 từ</td><td>✅ Toàn bộ</td></tr>
+      <tr><td>Cấp Trung bình, Nâng cao</td><td>🔒</td><td>✅</td></tr>
+      <tr><td>Thêm từ riêng, xuất/nhập file</td><td>🔒</td><td>✅</td></tr>
+      <tr><td>Học từ vựng, bảng điểm</td><td>✅</td><td>✅</td></tr>
+      <tr><td>Giá</td><td>Miễn phí</td><td><b id="price"></b></td></tr>
+    </table>
+  </section>
+
+  <section class="card" id="mua">
+    <h2>Mua bản đầy đủ trong 4 bước</h2>
+    <ol class="steps">
+      <li><b>Chơi thử</b> tại <a href="index.html">trang chơi</a> để chắc bé thích.</li>
+      <li><b>Lấy Mã máy:</b> mở <a href="admin.html">trang bố mẹ</a>, Mã máy nằm ở đầu trang (dạng <code>ABCD-EFGH-JKMN</code>), bấm Sao chép.</li>
+      <li><b>Chuyển khoản</b> bằng mã QR bên dưới. Dán Mã máy vào ô để QR tự điền nội dung chuyển khoản.</li>
+      <li><b>Nhận mã kích hoạt</b> qua Zalo (thường trong ít phút), dán vào trang bố mẹ là dùng được trọn đời trên thiết bị đó.</li>
+    </ol>
+
+    <div class="pay">
+      <label for="dev">Mã máy của bạn</label>
+      <input id="dev" placeholder="ABCD-EFGH-JKMN" autocomplete="off" autocapitalize="characters">
+      <p id="devErr" class="err"></p>
+      <div class="qrbox">
+        <img id="qr" alt="Mã QR chuyển khoản" width="260" height="260" hidden>
+        <p id="qrWait">Nhập Mã máy để hiện mã QR chuyển khoản.</p>
+      </div>
+      <dl id="bankInfo"></dl>
+      <a id="zaloBtn" class="btn" target="_blank" rel="noopener">💬 Nhắn Zalo gửi Mã máy</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Câu hỏi thường gặp</h2>
+    <details><summary>Mã kích hoạt dùng được trên mấy thiết bị?</summary><p>Mỗi mã gắn với 1 thiết bị (Mã máy). Muốn dùng thêm máy khác, gửi Mã máy của máy đó để nhận mã mới.</p></details>
+    <details><summary>Đổi điện thoại hoặc xoá dữ liệu trình duyệt thì sao?</summary><p>Mã máy sẽ đổi. Bạn nhắn Zalo cho mình để được cấp lại mã, không mất thêm phí.</p></details>
+    <details><summary>Có cần mạng không?</summary><p>Chỉ cần mạng lần đầu để mở game và cài vào màn hình chính. Sau đó chơi offline được.</p></details>
+    <details><summary>Dữ liệu của bé lưu ở đâu?</summary><p>Chỉ lưu ngay trên thiết bị của bạn, không gửi lên máy chủ nào.</p></details>
+  </section>
+</main>
+
+<footer>
+  <p>Hỗ trợ: Zalo <b id="zaloText"></b></p>
+</footer>
+
+<script src="config.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const digits = (SHOP.zalo || '').replace(/\D/g, '');
+$('price').textContent = SHOP.price || '';
+$('zaloText').textContent = SHOP.zalo || '';
+$('zaloBtn').href = digits ? 'https://zalo.me/' + digits : '#';
+$('zaloBtn').hidden = !digits;
+
+// Thông tin chuyển khoản (dựng bằng DOM, không chèn HTML thô)
+[['Ngân hàng', SHOP.bankCode], ['Số tài khoản', SHOP.account], ['Chủ tài khoản', SHOP.accountName],
+ ['Số tiền', SHOP.amount ? SHOP.amount.toLocaleString('vi-VN') + 'đ' : '']].forEach(([k, v]) => {
+  if (!v) return;
+  const dt = document.createElement('dt'), dd = document.createElement('dd');
+  dt.textContent = k; dd.textContent = v;
+  $('bankInfo').append(dt, dd);
+});
+
+function renderQr() {
+  const id = $('dev').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const ok = /^[A-HJ-NP-Z2-9]{12}$/.test(id);
+  $('devErr').textContent = id && !ok ? 'Mã máy gồm 12 ký tự (chữ + số, không có 0, 1, O, I).' : '';
+  $('qr').hidden = !ok; $('qrWait').hidden = ok;
+  if (!ok) return;
+  const q = new URLSearchParams({ amount: SHOP.amount || '', addInfo: 'DAIDUONG ' + id, accountName: SHOP.accountName || '' });
+  $('qr').src = `https://img.vietqr.io/image/${encodeURIComponent(SHOP.bankCode)}-${encodeURIComponent(SHOP.account)}-compact2.png?${q}`;
+}
+$('dev').oninput = renderQr;
+</script>
+</body>
+</html>
