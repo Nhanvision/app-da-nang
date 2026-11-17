@@ -1,5 +1,6 @@
 'use strict';
 const ROUND = 10, LIVES = 3;
+const REVIEW_CFG = { name: 'Ôn từ hay sai', speed: LEVELS.basic.speed, fish: 6 };
 // [màu sáng, màu đậm] của thân cá
 const COLORS = [['#ff9a3c','#d9480f'],['#ffd43b','#e67700'],['#74c0fc','#1864ab'],['#f783ac','#a61e4d'],
   ['#b197fc','#5f3dc4'],['#69db7c','#2b8a3e'],['#ff8787','#c92a2a'],['#63e6be','#087f5b']];
@@ -41,6 +42,39 @@ const bestKey = l => 'oceanvocab-best-' + l;
 function loadBest(l) { try { return +localStorage.getItem(bestKey(l)) || 0; } catch (e) { return 0; } }
 function saveBest(l, v) { try { localStorage.setItem(bestKey(l), v); } catch (e) {} }
 
+// ---------- âm thanh hiệu ứng (tự tạo bằng WebAudio, không cần file) ----------
+let actx = null;
+function tone(freq, start, dur, type = 'sine', vol = 0.16) {
+  const t = actx.currentTime + start, o = actx.createOscillator(), g = actx.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.015);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(actx.destination);
+  o.start(t); o.stop(t + dur + 0.02);
+}
+const SFX = {
+  ok:    () => { tone(660, 0, .12, 'triangle'); tone(880, .09, .2, 'triangle'); },
+  fast:  () => { tone(660, 0, .1, 'triangle'); tone(880, .08, .1, 'triangle'); tone(1320, .16, .25, 'triangle'); },
+  bad:   () => { tone(180, 0, .22, 'sawtooth', .1); tone(140, .12, .25, 'sawtooth', .1); },
+  win:   () => [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .12, .3, 'triangle')),
+  lose:  () => [392, 330, 262, 196].forEach((f, i) => tone(f, i * .16, .3, 'sine')),
+  flip:  () => tone(520, 0, .08, 'sine', .1)
+};
+function sfx(name) {
+  if (!$('optSfx').checked) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    SFX[name]();
+  } catch (e) { /* trình duyệt không hỗ trợ âm thanh: bỏ qua */ }
+}
+// Nhớ lựa chọn bật/tắt âm thanh
+[['optSound', 'speech'], ['optSfx', 'sfx']].forEach(([id, key]) => {
+  $(id).checked = store.get(key, true);
+  $(id).onchange = () => store.set(key, $(id).checked);
+});
+
 function speak(text) {
   if (!$('optSound').checked || !('speechSynthesis' in window)) return;
   speechSynthesis.cancel();
@@ -71,6 +105,9 @@ function refreshMenu() {
       : `📚 ${c.total} từ` + (c.added ? ` (có ${c.added} từ bố mẹ thêm)` : '');
   }
   $('modeHelp').textContent = { play: 'Chọn cấp độ để chơi:', study: 'Chọn cấp độ để học các từ trước khi chơi:', board: 'Top 10 điểm cao nhất của từng cấp độ:' }[menuMode];
+  const nHard = hardWords().length;
+  $('btnReview').hidden = menuMode === 'board' || !nHard;
+  $('btnReview').textContent = (menuMode === 'study' ? '📌 Học các từ hay sai · ' : '🧠 Ôn từ hay sai · ') + nHard + ' từ';
   $('levelsBox').hidden = menuMode === 'board';
   $('boardBox').hidden = menuMode !== 'board';
   if (menuMode === 'board') renderBoard();
@@ -117,9 +154,9 @@ function renderBoard() {
 // ---------- học từ vựng (thẻ nhớ) ----------
 let study = null;   // { lvl, words, i, flipped }
 function openStudy(lvl) {
-  study = { lvl, words: getPool(lvl), i: 0, flipped: false };
+  study = { lvl, words: lvl === 'review' ? hardWords() : getPool(lvl), i: 0, flipped: false };
   $('menu').hidden = true; $('study').hidden = false;
-  $('stTitle').textContent = 'Học từ · ' + LEVELS[lvl].name;
+  $('stTitle').textContent = 'Học từ · ' + (lvl === 'review' ? 'Từ hay sai' : LEVELS[lvl].name);
   renderStudy();
 }
 function renderStudy() {
@@ -144,7 +181,7 @@ function studyGo(d) {
   study.i = (study.i + d + n) % n; study.flipped = false; renderStudy();
   speak(study.words[study.i][0]);
 }
-$('card').onclick = () => { study.flipped = !study.flipped; renderStudy(); };
+$('card').onclick = () => { study.flipped = !study.flipped; sfx('flip'); renderStudy(); };
 $('card').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('card').click(); } };
 $('stNext').onclick = () => studyGo(1);
 $('stPrev').onclick = () => studyGo(-1);
@@ -161,17 +198,23 @@ document.querySelectorAll('.lvl').forEach(b => b.onclick = () => {
   if (menuMode === 'study') return openStudy(b.dataset.lvl);
   startGame(b.dataset.lvl);
 });
+$('btnReview').onclick = () => menuMode === 'study' ? openStudy('review') : startGame('review');
 $('btnQuit').onclick = showMenu;
 $('btnMenu').onclick = showMenu;
-$('btnAgain').onclick = () => startGame(st.lvl);
+$('btnAgain').onclick = () => {
+  if (st.review && !hardWords().length) return showMenu();   // đã ôn hết từ hay sai
+  startGame(st.lvl);
+};
 
 // ---------- ván chơi ----------
 function startGame(lvl) {
   if (st) clearTimeout(st.nextT);
   stopLoop(); clearFish();
-  const pool = shuffle(getPool(lvl));
+  const review = lvl === 'review';   // chế độ ôn các từ hay sai
+  const pool = shuffle(review ? allPool() : getPool(lvl));
+  const queue = review ? shuffle(hardWords()).slice(0, ROUND) : pool.slice(0, ROUND);
   st = {
-    lvl, cfg: LEVELS[lvl], pool, round: Math.min(ROUND, pool.length), queue: pool.slice(0, ROUND),
+    lvl, review, cfg: review ? REVIEW_CFG : LEVELS[lvl], pool, round: queue.length, queue,
     idx: 0, score: 0, lives: LIVES, combo: 0, wrong: [], times: [],
     fish: [], target: null, askedAt: 0, missedThis: false, locked: false
   };
@@ -280,12 +323,16 @@ function onPick(f) {
     st.score += pts;
     floatText(f, '+' + pts + (!st.missedThis && speedBonus(secs) >= 7 ? ' ⚡' : ''));
     f.el.classList.add('ok');
+    if (!st.missedThis) markGood(f.word);
+    sfx(!st.missedThis && speedBonus(secs) >= 7 ? 'fast' : 'ok');
     speak(f.word[0]);
     st.idx++;
     updateHud();
     st.nextT = setTimeout(nextWord, 700);
   } else {
+    if (!st.missedThis) markHard(st.target);   // ghi nhớ từ này khó với bé
     st.combo = 0; st.missedThis = true;
+    sfx('bad');
     st.lives--;
     if (!st.wrong.includes(st.target)) st.wrong.push(st.target);
     f.el.classList.remove('bad'); void f.el.offsetWidth; f.el.classList.add('bad');
@@ -298,7 +345,7 @@ function endGame(won) {
   stopLoop(); clearFish();
   const done = st.idx;
   const stars = won ? (st.lives >= 3 ? 3 : st.lives === 2 ? 2 : 1) : 0;
-  const prev = loadBest(st.lvl);
+  const prev = st.review ? Infinity : loadBest(st.lvl);   // ôn từ hay sai không tính kỷ lục
   const newBest = st.score > prev;
   if (newBest) saveBest(st.lvl, st.score);
   $('hud').hidden = true; $('result').hidden = false;
@@ -312,13 +359,16 @@ function endGame(won) {
     ? '<b>Các từ cần ôn lại:</b>' + st.wrong.map(w => `<span>${w[0]} = ${w[1]}</span>`).join('')
     : '';
   $('savedMsg').textContent = '';
-  const canSave = qualifies(st.lvl, st.score);
+  const canSave = !st.review && qualifies(st.lvl, st.score);
   $('nameRow').hidden = !canSave;
   if (canSave) { $('playerName').value = store.get('lastName', ''); st.saved = false; }
+  const left = hardWords().length;
+  if (st.review) $('savedMsg').textContent = left ? `🧠 Còn ${left} từ hay sai, chơi tiếp để nhớ nhé!` : '🎉 Hết từ hay sai rồi, bé giỏi quá!';
+  sfx(won ? 'win' : 'lose');
   if (won) speak('Well done!');
 }
 function saveScoreNow() {
-  if (!st || st.saved || !qualifies(st.lvl, st.score)) return;
+  if (!st || st.review || st.saved || !qualifies(st.lvl, st.score)) return;
   addScore(st.lvl, $('playerName').value, st.score);
   st.saved = true;
   $('nameRow').hidden = true;

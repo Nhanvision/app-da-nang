@@ -127,3 +127,19 @@ function addScore(lvl, name, score) {
   store.set('board', b);
   store.set('lastName', b[lvl].find(e => e.s === score).n);
 }
+
+// ---- Từ hay sai: { 'từ-viết-thường': điểm khó }. Sai +2, đúng liền mạch -1, về 0 thì coi như đã nhớ ----
+const getHard = () => store.get('hard', {});
+function allPool() {   // mọi từ đang dùng được ở các cấp, bỏ trùng
+  const seen = new Set(), out = [];
+  for (const l in LEVELS) for (const w of getPool(l)) { const k = w[0].toLowerCase(); if (!seen.has(k)) { seen.add(k); out.push(w); } }
+  return out;
+}
+function hardWords() { const h = getHard(); return allPool().filter(w => h[w[0].toLowerCase()] > 0); }
+function markHard(w) { const h = getHard(), k = w[0].toLowerCase(); h[k] = Math.min((h[k] || 0) + 2, 6); store.set('hard', h); }
+function markGood(w) {
+  const h = getHard(), k = w[0].toLowerCase();
+  if (!h[k]) return;
+  if (--h[k] <= 0) delete h[k];
+  store.set('hard', h);
+}

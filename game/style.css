@@ -118,3 +118,9 @@ html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-syst
 .msg2{min-height:1.2em;margin:6px 0;font-weight:700;color:#2b8a3e}
 .tabs{flex-wrap:wrap}
 .levels[hidden],#boardBox[hidden]{display:none}
+
+/* ôn từ hay sai + tuỳ chọn âm thanh */
+.reviewBtn{display:block;width:100%;border:0;border-radius:16px;padding:12px;margin:2px 0 10px;font-size:17px;font-weight:800;color:#fff;background:#7048e8;box-shadow:0 4px 0 rgba(0,0,0,.2);cursor:pointer}
+.reviewBtn:active{transform:translateY(3px);box-shadow:none}
+.reviewBtn[hidden]{display:none}
+.opts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}

@@ -8,6 +8,7 @@ Game ôn từ vựng tiếng Anh: đọc nghĩa tiếng Việt, **bấm vào con
 - **Bảng điểm cao** (top 10 mỗi cấp, bé nhập tên; bố mẹ xoá được ở trang Admin). Hơn 250 từ mặc định.
 - Trang giới thiệu bán hàng `gioi-thieu.html` có mã QR chuyển khoản VietQR tự điền số tiền + nội dung (Mã máy); cấu hình ở `config.js`.
 - Tab **Học từ vựng**: thẻ nhớ (bấm để lật nghĩa, nghe phát âm) và danh sách từ trước khi chơi. Menu hiện số từ của từng cấp, gồm cả từ bố mẹ thêm.
+- **Âm thanh hiệu ứng** tự tạo (đúng, đúng nhanh, sai, thắng, thua), bật/tắt được. **Ôn từ hay sai**: game ghi các từ bé chọn sai (sai +2, đúng liền mạch -1, về 0 là đã nhớ); nút "Ôn từ hay sai" ở menu chơi lại đúng các từ đó, tab Học có thẻ riêng cho chúng.
 - Sau 12 giây chưa chọn, cá đúng sẽ phát sáng gợi ý.
 - Đọc to từ đúng bằng giọng trình duyệt (tắt được); lưu điểm cao nhất từng cấp; cuối ván liệt kê từ cần ôn.
 

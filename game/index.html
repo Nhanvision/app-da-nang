@@ -32,13 +32,17 @@
       <button class="tab" data-mode="board">🏆 Bảng điểm</button>
     </div>
     <p id="modeHelp" class="hint2"></p>
+    <button id="btnReview" class="reviewBtn" hidden></button>
     <div id="boardBox" hidden></div>
     <div class="levels" id="levelsBox">
       <button class="lvl" data-lvl="basic"><span>🐠</span><b>Cơ bản</b><small>Từ quen thuộc, có hình · cá bơi chậm</small><i id="cnt-basic"></i><em id="best-basic"></em></button>
       <button class="lvl" data-lvl="mid"><span>🐬</span><b>Trung bình</b><small>Từ thông dụng, dài hơn</small><i id="cnt-mid"></i><em id="best-mid"></em></button>
       <button class="lvl" data-lvl="adv"><span>🦈</span><b>Nâng cao</b><small>Từ khó, dễ nhầm</small><i id="cnt-adv"></i><em id="best-adv"></em></button>
     </div>
-    <label class="opt"><input type="checkbox" id="optSound" checked> 🔊 Đọc to từ tiếng Anh</label>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" id="optSound" checked> 🔊 Đọc to từ tiếng Anh</label>
+      <label class="opt"><input type="checkbox" id="optSfx" checked> 🔔 Âm thanh hiệu ứng</label>
+    </div>
   </section>
 
 
