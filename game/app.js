@@ -218,13 +218,10 @@ function spawnFish(w, i, n) {
   const LW = layer.clientWidth, H = layer.clientHeight;
   const top = 80, bottom = 130;
   const laneH = (H - top - bottom) / n;
-  // Nhiều cá thì thu nhỏ bớt để các làn không chồng lên nhau (tối thiểu 0.7)
-  const s = Math.max(0.7, Math.min(1, laneH / 66));
-  el.style.transformOrigin = '0 0';
   const f = {
-    el, word: w, dir, w: W * s, h: 78 * s, s,
-    x: rand(0, Math.max(10, LW - W * s)),
-    baseY: top + laneH * i + laneH / 2 - 39 * s,
+    el, word: w, dir, w: W, h: 78,
+    x: rand(0, Math.max(10, LW - W)),
+    baseY: top + laneH * i + laneH / 2 - 39,
     amp: Math.min(10, laneH / 4), ph: rand(0, 6.28),
     v: st.cfg.speed * rand(0.8, 1.25)
   };
@@ -235,7 +232,7 @@ function spawnFish(w, i, n) {
 
 function place(f, t) {
   const y = f.baseY + Math.sin(t * 1.6 + f.ph) * f.amp;
-  f.el.style.transform = `translate(${f.x}px,${y}px) scale(${f.s})`;
+  f.el.style.transform = `translate(${f.x}px,${y}px)`;
 }
 
 function loop(now) {

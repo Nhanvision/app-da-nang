@@ -70,11 +70,11 @@ WORDS.adv.push(
   ['vulnerable','dễ bị tổn thương']
 );
 
-// speed: px/giây, fish: số cá cùng lúc. Mọi cấp bơi cùng tốc độ; cấp cao hơn khó ở từ vựng và nhiều cá hơn.
+// speed: px/giây, fish: số cá cùng lúc. Mọi cấp bơi cùng tốc độ; cấp cao hơn khó ở từ vựng.
 const LEVELS = {
-  basic: { name: 'Cơ bản', speed: 80, fish: 5 },
-  mid:   { name: 'Trung bình', speed: 80, fish: 7 },
-  adv:   { name: 'Nâng cao', speed: 80, fish: 9 }
+  basic: { name: 'Cơ bản', speed: 80, fish: 6 },
+  mid:   { name: 'Trung bình', speed: 80, fish: 6 },
+  adv:   { name: 'Nâng cao', speed: 80, fish: 6 }
 };
 const MIN_WORDS = 4, TRIAL_WORDS = 10;
 const LIC = { ok: false };   // true khi đã kích hoạt (xem license.js)
