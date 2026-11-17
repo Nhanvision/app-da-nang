@@ -2,7 +2,7 @@
 
 Game ôn từ vựng tiếng Anh: đọc nghĩa tiếng Việt, **bấm vào con cá đang bơi mang đúng từ tiếng Anh** rồi qua từ tiếp theo.
 
-- 3 cấp độ: Cơ bản (cá chậm, từ có hình emoji), Trung bình, Nâng cao (cá nhanh, từ khó).
+- 3 cấp độ: Cơ bản (từ có hình emoji), Trung bình, Nâng cao (từ khó, dễ nhầm).
 - Mỗi ván 10 từ, 3 mạng ❤️; chọn sai mất mạng. **Điểm theo thời gian**: đúng được 10 điểm + thưởng tốc độ tới 10 điểm (giảm dần về 0 sau 8 giây, có thanh thời gian), cộng thêm thưởng chuỗi đúng liên tiếp.
 - Mọi cấp độ cá bơi cùng tốc độ; cấp cao hơn khó ở từ vựng.
 - Tab **Học từ vựng**: thẻ nhớ (bấm để lật nghĩa, nghe phát âm) và danh sách từ trước khi chơi. Menu hiện số từ của từng cấp, gồm cả từ bố mẹ thêm.
