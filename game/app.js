@@ -60,24 +60,72 @@ setInterval(() => {
 }, 700);
 
 // ---------- menu ----------
+let menuMode = 'play';   // 'play' | 'study'
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => { menuMode = t.dataset.mode; refreshMenu(); });
 function refreshMenu() {
   for (const l in LEVELS) {
     const b = loadBest(l);
-    $('best-' + l).textContent = !LIC.ok && l !== 'basic' ? '🔒 Cần kích hoạt bản đầy đủ' : b ? '🏆 Điểm cao nhất: ' + b : 'Chưa chơi';
+    const locked = !LIC.ok && l !== 'basic', c = wordCounts(l);
+    $('best-' + l).textContent = locked ? '🔒 Cần kích hoạt bản đầy đủ' : b ? '🏆 Điểm cao nhất: ' + b : 'Chưa chơi';
+    $('cnt-' + l).textContent = locked ? `📚 ${c.full} từ trong bản đầy đủ`
+      : `📚 ${c.total} từ` + (c.added ? ` (có ${c.added} từ bố mẹ thêm)` : '');
   }
+  $('modeHelp').textContent = menuMode === 'play' ? 'Chọn cấp độ để chơi:' : 'Chọn cấp độ để học các từ trước khi chơi:';
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.mode === menuMode));
   $('licBanner').innerHTML = LIC.ok ? '✅ Bản đầy đủ' : `🎁 Bản dùng thử: cấp Cơ bản, ${TRIAL_WORDS} từ · <a href="admin.html">Kích hoạt (bố mẹ)</a>`;
 }
 function showMenu() {
+  if (st) clearTimeout(st.nextT);   // huỷ bước chuyển từ đang chờ nếu thoát giữa chừng
   stopLoop(); clearFish(); delete $('sea').dataset.lvl;
-  $('menu').hidden = false; $('result').hidden = true; $('hud').hidden = true;
+  $('menu').hidden = false; $('result').hidden = true; $('hud').hidden = true; $('study').hidden = true;
   refreshMenu();
 }
+
+// ---------- học từ vựng (thẻ nhớ) ----------
+let study = null;   // { lvl, words, i, flipped }
+function openStudy(lvl) {
+  study = { lvl, words: getPool(lvl), i: 0, flipped: false };
+  $('menu').hidden = true; $('study').hidden = false;
+  $('stTitle').textContent = 'Học từ · ' + LEVELS[lvl].name;
+  renderStudy();
+}
+function renderStudy() {
+  const w = study.words[study.i], n = study.words.length;
+  $('cardEmoji').textContent = w[2] || '';
+  $('cardMain').textContent = study.flipped ? w[1] : w[0];
+  $('cardMain').className = study.flipped ? 'vi' : 'en';
+  $('cardHint').textContent = study.flipped ? w[0] : 'Bấm vào thẻ để xem nghĩa';
+  $('stPos').textContent = `Từ ${study.i + 1}/${n}`;
+  $('stList').innerHTML = '';
+  study.words.forEach((x, k) => {
+    const d = document.createElement('div');
+    d.className = 'stRow' + (k === study.i ? ' cur' : '');
+    d.innerHTML = '<b></b><span></span>';
+    d.firstChild.textContent = x[0]; d.lastChild.textContent = x[1];
+    d.onclick = () => { study.i = k; study.flipped = false; renderStudy(); speak(x[0]); };
+    $('stList').appendChild(d);
+  });
+}
+function studyGo(d) {
+  const n = study.words.length;
+  study.i = (study.i + d + n) % n; study.flipped = false; renderStudy();
+  speak(study.words[study.i][0]);
+}
+$('card').onclick = () => { study.flipped = !study.flipped; renderStudy(); };
+$('card').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('card').click(); } };
+$('stNext').onclick = () => studyGo(1);
+$('stPrev').onclick = () => studyGo(-1);
+$('stSpeak').onclick = () => speak(study.words[study.i][0]);
+$('stShuffle').onclick = () => { study.words = shuffle(study.words); study.i = 0; study.flipped = false; renderStudy(); };
+$('stBack').onclick = showMenu;
+$('stPlay').onclick = () => { $('study').hidden = true; startGame(study.lvl); };
 document.querySelectorAll('.lvl').forEach(b => b.onclick = () => {
   if (!LIC.ok && b.dataset.lvl !== 'basic') {
     if (confirm('🔒 Cấp độ này có trong bản đầy đủ. Nhờ bố mẹ kích hoạt ở trang bố mẹ. Mở trang đó ngay?')) location.href = 'admin.html';
     return;
   }
   if (getPool(b.dataset.lvl).length < MIN_WORDS) return alert('Cấp độ này cần ít nhất ' + MIN_WORDS + ' từ. Nhờ bố mẹ vào trang Admin để thêm từ hoặc bỏ chế độ "chỉ dùng từ của tôi".');
+  if (menuMode === 'study') return openStudy(b.dataset.lvl);
   startGame(b.dataset.lvl);
 });
 $('btnQuit').onclick = showMenu;
@@ -86,11 +134,12 @@ $('btnAgain').onclick = () => startGame(st.lvl);
 
 // ---------- ván chơi ----------
 function startGame(lvl) {
+  if (st) clearTimeout(st.nextT);
   stopLoop(); clearFish();
   const pool = shuffle(getPool(lvl));
   st = {
     lvl, cfg: LEVELS[lvl], pool, round: Math.min(ROUND, pool.length), queue: pool.slice(0, ROUND),
-    idx: 0, score: 0, lives: LIVES, combo: 0, wrong: [],
+    idx: 0, score: 0, lives: LIVES, combo: 0, wrong: [], times: [],
     fish: [], target: null, askedAt: 0, missedThis: false, locked: false
   };
   $('sea').dataset.lvl = lvl;
@@ -157,6 +206,12 @@ function loop(now) {
   const dt = Math.min(0.05, (now - lastT) / 1000);
   lastT = now;
   const W = layer.clientWidth;
+  if (!st.locked) {   // thanh thời gian: còn bao nhiêu điểm thưởng tốc độ
+    const left = Math.max(0, 1 - (now - st.askedAt) / 1000 / BONUS_SECS);
+    const bar = $('timeBar').firstChild;
+    bar.style.width = (left * 100) + '%';
+    bar.style.background = left > .5 ? '#2fb36b' : left > .2 ? '#f09a1a' : '#d9453d';
+  }
   for (const f of st.fish) {
     if (f.dead) continue;
     f.x += f.dir * f.v * dt;
@@ -169,25 +224,40 @@ function loop(now) {
 }
 function stopLoop() { cancelAnimationFrame(rafId); rafId = 0; }
 
+// Điểm theo thời gian: đúng được BASE_PTS, cộng thưởng tốc độ giảm dần về 0 sau BONUS_SECS giây
+const BASE_PTS = 10, BONUS_MAX = 10, BONUS_SECS = 8;
+const speedBonus = secs => Math.round(BONUS_MAX * Math.max(0, 1 - secs / BONUS_SECS));
+function floatText(f, text) {
+  const t = document.createElement('div');
+  t.className = 'floatPts'; t.textContent = text;
+  t.style.left = (f.x + f.w / 2) + 'px'; t.style.top = (parseFloat(f.el.style.transform.split(',')[1]) || 0) + 'px';
+  layer.appendChild(t);
+  setTimeout(() => t.remove(), 650);
+}
+
 function onPick(f) {
   if (st.locked || f.dead) return;
   if (f.word === st.target) {
     st.locked = true; f.dead = true;
-    st.combo++;
-    st.score += 10 + Math.min(st.combo - 1, 5) * 2 + (st.missedThis ? -5 : 0);
-    if (st.missedThis) st.combo = 0;
+    const secs = (performance.now() - st.askedAt) / 1000;
+    st.times.push(secs);
+    let pts;
+    if (st.missedThis) { pts = BASE_PTS / 2; st.combo = 0; }      // đã chọn sai thì không có điểm tốc độ
+    else { st.combo++; pts = BASE_PTS + speedBonus(secs) + Math.min(st.combo - 1, 5) * 2; }
+    st.score += pts;
+    floatText(f, '+' + pts + (!st.missedThis && speedBonus(secs) >= 7 ? ' ⚡' : ''));
     f.el.classList.add('ok');
     speak(f.word[0]);
     st.idx++;
     updateHud();
-    setTimeout(nextWord, 700);
+    st.nextT = setTimeout(nextWord, 700);
   } else {
     st.combo = 0; st.missedThis = true;
     st.lives--;
     if (!st.wrong.includes(st.target)) st.wrong.push(st.target);
     f.el.classList.remove('bad'); void f.el.offsetWidth; f.el.classList.add('bad');
     updateHud();
-    if (st.lives <= 0) { st.locked = true; setTimeout(() => endGame(false), 500); }
+    if (st.lives <= 0) { st.locked = true; st.nextT = setTimeout(() => endGame(false), 500); }
   }
 }
 
@@ -201,7 +271,9 @@ function endGame(won) {
   $('hud').hidden = true; $('result').hidden = false;
   $('rTitle').textContent = won ? '🎉 Giỏi lắm!' : '😢 Hết mạng rồi!';
   $('rStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+  const avg = st.times.length ? (st.times.reduce((a, b) => a + b, 0) / st.times.length).toFixed(1) : null;
   $('rScore').innerHTML = `Cấp độ <b>${st.cfg.name}</b> · Đúng <b>${done}/${st.round}</b> từ · Điểm <b>${st.score}</b>` +
+    (avg ? `<br>⏱️ Trung bình <b>${avg}</b> giây/từ` : '') +
     (newBest ? '<br>🏆 Kỷ lục mới!' : '');
   $('rWrong').innerHTML = st.wrong.length
     ? '<b>Các từ cần ôn lại:</b>' + st.wrong.map(w => `<span>${w[0]} = ${w[1]}</span>`).join('')

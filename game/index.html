@@ -24,21 +24,47 @@
   <!-- MENU -->
   <section id="menu" class="panel">
     <h1>🌊 Đại Dương Từ Vựng</h1>
-    <p>Đọc nghĩa tiếng Việt, rồi <b>bấm vào con cá mang đúng từ tiếng Anh</b>!</p>
+    <p>Đọc nghĩa tiếng Việt, rồi <b>bấm thật nhanh vào con cá mang đúng từ tiếng Anh</b>. Càng nhanh điểm càng cao!</p>
     <p id="licBanner" class="lic"></p>
+    <div class="tabs">
+      <button class="tab on" data-mode="play">🎮 Chơi game</button>
+      <button class="tab" data-mode="study">📖 Học từ vựng</button>
+    </div>
+    <p id="modeHelp" class="hint2"></p>
     <div class="levels">
-      <button class="lvl" data-lvl="basic"><span>🐠</span><b>Cơ bản</b><small>Từ quen thuộc · cá bơi chậm</small><em id="best-basic"></em></button>
-      <button class="lvl" data-lvl="mid"><span>🐬</span><b>Trung bình</b><small>Từ thông dụng · cá bơi vừa</small><em id="best-mid"></em></button>
-      <button class="lvl" data-lvl="adv"><span>🦈</span><b>Nâng cao</b><small>Từ khó · cá bơi nhanh</small><em id="best-adv"></em></button>
+      <button class="lvl" data-lvl="basic"><span>🐠</span><b>Cơ bản</b><small>Từ quen thuộc, có hình minh hoạ</small><i id="cnt-basic"></i><em id="best-basic"></em></button>
+      <button class="lvl" data-lvl="mid"><span>🐬</span><b>Trung bình</b><small>Từ thông dụng, dài hơn</small><i id="cnt-mid"></i><em id="best-mid"></em></button>
+      <button class="lvl" data-lvl="adv"><span>🦈</span><b>Nâng cao</b><small>Từ khó, dễ nhầm</small><i id="cnt-adv"></i><em id="best-adv"></em></button>
     </div>
     <label class="opt"><input type="checkbox" id="optSound" checked> 🔊 Đọc to từ tiếng Anh</label>
   </section>
 
 
+  <!-- HỌC TỪ VỰNG -->
+  <section id="study" class="panel" hidden>
+    <div class="studyTop"><button id="stBack" class="link">← Về menu</button><b id="stTitle"></b></div>
+    <div id="card" class="card3d" tabindex="0" role="button" aria-label="Thẻ từ, bấm để lật">
+      <div id="cardEmoji"></div>
+      <div id="cardMain"></div>
+      <div id="cardHint">Bấm vào thẻ để xem nghĩa</div>
+    </div>
+    <div class="row">
+      <button id="stPrev" class="big alt">‹</button>
+      <button id="stSpeak" class="big alt">🔊</button>
+      <button id="stNext" class="big">›</button>
+    </div>
+    <p id="stPos"></p>
+    <div class="row">
+      <button id="stShuffle" class="link">🔀 Trộn thứ tự</button>
+      <button id="stPlay" class="big">🎮 Chơi cấp này</button>
+    </div>
+    <div id="stList"></div>
+  </section>
+
   <!-- HUD -->
   <div id="hud" hidden>
     <button id="btnQuit" title="Về menu">✕</button>
-    <div id="prompt"><span id="pEmoji"></span><span id="pText"></span></div>
+    <div id="prompt"><span id="pEmoji"></span><span id="pText"></span><div id="timeBar"><i></i></div></div>
     <div class="stats"><span id="hearts"></span><span id="score">0</span><span id="progress">1/10</span></div>
   </div>
 

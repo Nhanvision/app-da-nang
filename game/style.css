@@ -76,3 +76,33 @@ html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-syst
 .stail{transform-origin:40px 50px;animation:wag .9s ease-in-out infinite alternate}
 .flip1{transform-origin:100px 55px;animation:flap .9s ease-in-out infinite alternate}
 .flip2{transform-origin:40px 55px;animation:flap .9s ease-in-out infinite alternate-reverse}
+
+/* tab menu + đếm từ */
+.tabs{display:flex;gap:6px;justify-content:center;margin:8px 0 2px}
+.tab{border:2px solid #9ec5e6;background:#fff;color:#0a4a82;border-radius:14px;padding:8px 14px;font-weight:800;cursor:pointer;font-size:15px}
+.tab.on{background:#0a6ebd;color:#fff;border-color:#0a6ebd}
+.hint2{margin:6px 0 0;font-size:14px;opacity:.85}
+.lvl i{font-style:normal;font-size:13px;font-weight:700;background:rgba(255,255,255,.25);border-radius:8px;padding:1px 8px;justify-self:start}
+.lic{margin:4px 0;font-size:14px}
+/* thanh thời gian + điểm bay */
+#timeBar{height:7px;border-radius:5px;background:rgba(10,74,130,.15);margin-top:5px;overflow:hidden}
+#timeBar i{display:block;height:100%;width:100%;border-radius:5px;transition:background .3s}
+.floatPts{position:absolute;transform:translate(-50%,0);font-weight:900;font-size:26px;color:#ffeb3b;text-shadow:0 2px 4px rgba(0,0,0,.7);pointer-events:none;animation:floatUp .65s ease-out forwards;z-index:4}
+@keyframes floatUp{to{transform:translate(-50%,-50px);opacity:0}}
+/* học từ vựng */
+.studyTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.card3d{background:linear-gradient(#fff,#e8f3fc);border:3px solid #9ec5e6;border-radius:22px;padding:18px 12px;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;margin-bottom:10px;box-shadow:0 6px 0 #9ec5e6}
+.card3d:active{transform:translateY(3px);box-shadow:0 3px 0 #9ec5e6}
+#cardEmoji{font-size:54px;min-height:60px}
+#cardMain.en{font-size:clamp(30px,8vw,46px);font-weight:900;color:#0a6ebd;word-break:break-word}
+#cardMain.vi{font-size:clamp(24px,6vw,34px);font-weight:800;color:#2b8a3e}
+#cardHint{font-size:14px;opacity:.7}
+#stPos{margin:8px 0}
+#stList{text-align:left;max-height:170px;overflow:auto;margin-top:10px;border-top:2px solid #d8e9f6;padding-top:6px}
+.stRow{display:flex;justify-content:space-between;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:15px}
+.stRow:hover{background:#eef6fd}.stRow.cur{background:#d6ebfb}.stRow b{color:#0a6ebd}.stRow span{opacity:.85;text-align:right}
+.lvl{grid-template-rows:repeat(4,auto)}
+.lvl span{grid-row:1/5}
+.lvl b,.lvl small,.lvl i,.lvl em{grid-column:2}
+.lvl i{margin:3px 0}
+.link{border:0;background:none;color:#0a6ebd;text-decoration:underline;font-size:14px;cursor:pointer;padding:4px}

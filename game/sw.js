@@ -1,4 +1,4 @@
-const CACHE = 'daiduong-v4';
+const CACHE = 'daiduong-v5';
 const FILES = ['./', 'index.html', 'admin.html', 'style.css', 'admin.css', 'data.js', 'app.js', 'admin.js', 'config.js', 'license.js', 'license-key.js',
   'manifest.json', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => {

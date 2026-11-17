@@ -27,11 +27,11 @@ const WORDS = {
   ]
 };
 
-// speed: px/giây, fish: số cá cùng lúc
+// speed: px/giây, fish: số cá cùng lúc. Mọi cấp bơi cùng tốc độ; cấp cao hơn khó ở từ vựng.
 const LEVELS = {
-  basic: { name: 'Cơ bản', speed: 60, fish: 5 },
-  mid:   { name: 'Trung bình', speed: 100, fish: 6 },
-  adv:   { name: 'Nâng cao', speed: 140, fish: 7 }
+  basic: { name: 'Cơ bản', speed: 80, fish: 6 },
+  mid:   { name: 'Trung bình', speed: 80, fish: 6 },
+  adv:   { name: 'Nâng cao', speed: 80, fish: 6 }
 };
 const MIN_WORDS = 4, TRIAL_WORDS = 10;
 const LIC = { ok: false };   // true khi đã kích hoạt (xem license.js)
@@ -54,6 +54,13 @@ function getPool(lvl) {
   return out;
 }
 // "english - nghĩa" mỗi dòng; chấp nhận - – = | : hoặc tab
+// Số từ của một cấp: tổng đang dùng được và số từ do bố mẹ thêm (không tính từ trùng từ mặc định)
+function wordCounts(lvl) {
+  const pool = getPool(lvl);
+  if (!LIC.ok) return { total: pool.length, added: 0, full: WORDS[lvl].length };
+  const base = new Set(WORDS[lvl].map(w => w[0].toLowerCase()));
+  return { total: pool.length, added: pool.filter(w => !base.has(w[0].toLowerCase())).length, full: WORDS[lvl].length };
+}
 function parseWords(text) {
   const ok = [], bad = [];
   for (const raw of text.split(/\r?\n/)) {
