@@ -48,6 +48,9 @@ section[hidden]{display:none}
 <section id="make" hidden>
   <label>Dán Mã máy của khách (XXXX-XXXX-XXXX)</label>
   <input id="devId" placeholder="ABCD-EFGH-JKMN" autocomplete="off" autocapitalize="characters">
+  <label>Hạn sử dụng</label>
+  <input id="expDate" type="date">
+  <label style="font-weight:400"><input id="noExp" type="checkbox" style="width:auto"> Không hết hạn (trọn đời)</label>
   <button id="go">Tạo mã kích hoạt</button>
   <textarea id="out" rows="4" readonly placeholder="Mã kích hoạt sẽ hiện ở đây"></textarea>
   <button id="copy" class="alt">Sao chép mã</button>
@@ -127,9 +130,13 @@ $('forget').onclick = () => {
 $('go').onclick = async () => {
   const id = $('devId').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
   if (!/^[A-HJ-NP-Z2-9]{12}$/.test(id)) return say('Mã máy phải gồm 12 ký tự (chữ + số, không có 0, 1, O, I).');
-  const sig = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, signKey, enc.encode('DAIDUONG|v1|' + id));
-  $('out').value = b64u(new Uint8Array(sig));
-  say('✅ Mã dành riêng cho máy ' + id.match(/.{4}/g).join('-') + '. Gửi mã này cho khách.');
+  const noExp = $('noExp').checked;
+  const ymd = $('expDate').value.replace(/-/g, '');
+  if (!noExp && !/^\d{8}$/.test(ymd)) return say('Hãy chọn ngày hết hạn (hoặc tick Không hết hạn).');
+  const msg = noExp ? 'DAIDUONG|v1|' + id : 'DAIDUONG|v2|' + id + '|' + ymd;
+  const sig = b64u(new Uint8Array(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, signKey, enc.encode(msg))));
+  $('out').value = noExp ? sig : ymd + '.' + sig;
+  say('✅ Mã cho máy ' + id.match(/.{4}/g).join('-') + (noExp ? ', không hết hạn.' : ', hết hạn ' + ymd.slice(6) + '/' + ymd.slice(4, 6) + '/' + ymd.slice(0, 4) + '.') + ' Gửi mã này cho khách.');
 };
 $('copy').onclick = () => {
   if (!$('out').value) return say('Chưa có mã để sao chép.');
@@ -137,6 +144,9 @@ $('copy').onclick = () => {
   navigator.clipboard.writeText($('out').value).then(() => say('Đã sao chép mã.'), () => say('Hãy bôi đen mã và sao chép thủ công.'));
 };
 
+// Mặc định hạn = hôm nay + 1 năm (giờ địa phương)
+(() => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); $('expDate').value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
+$('noExp').onchange = () => $('expDate').disabled = $('noExp').checked;
 if (!crypto.subtle) say('⚠️ Trình duyệt chỉ ký được khi mở bằng https hoặc localhost.');
 show(localStorage.getItem(STORE) ? 'unlock' : 'setup');
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));

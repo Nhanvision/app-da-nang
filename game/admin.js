@@ -69,7 +69,10 @@ function renderAdmin() {
 
 // ---------- Kích hoạt bản đầy đủ ----------
 function renderLic() {
-  $('licStatus').innerHTML = LIC.ok ? '✅ <b>Đã kích hoạt bản đầy đủ</b> trên thiết bị này.' : '🎁 Đang dùng bản dùng thử (chỉ cấp Cơ bản, ' + TRIAL_WORDS + ' từ).';
+  $('licStatus').innerHTML = LIC.ok
+    ? '✅ <b>Đã kích hoạt bản đầy đủ</b>' + (LIC.exp ? ' · còn hạn đến <b>' + fmtDate(LIC.exp) + '</b>' : ' (không hết hạn)') + '.'
+    : LIC.expired ? '⚠️ Bản đầy đủ <b>đã hết hạn ngày ' + fmtDate(LIC.exp) + '</b>. Nhập mã gia hạn mới để dùng tiếp (từ riêng của bố mẹ vẫn được giữ).'
+    : '🎁 Đang dùng bản dùng thử (chỉ cấp Cơ bản, ' + TRIAL_WORDS + ' từ).';
   $('licForm').hidden = LIC.ok;
   $('admWords').hidden = !LIC.ok;
   $('devId').textContent = $('devId0').textContent = fmtDeviceId(getDeviceId());
@@ -87,7 +90,9 @@ $('devCopy').onclick = () => copyDeviceId($('devCopy'));
 $('devCopy0').onclick = () => copyDeviceId($('devCopy0'));
 $('licGo').onclick = async () => {
   if (!crypto.subtle) return $('licMsg').textContent = 'Trình duyệt chỉ kích hoạt được khi mở bằng https (hoặc localhost).';
-  if (await activateCode($('licCode').value)) { $('licMsg').textContent = ''; renderLic(); }
+  const r = await activateCode($('licCode').value);
+  if (r === 'ok') { $('licMsg').textContent = ''; $('licCode').value = ''; renderLic(); }
+  else if (r === 'expired') { $('licMsg').textContent = '⌛ Mã này đã hết hạn. Nhắn người bán để nhận mã mới.'; renderLic(); }
   else $('licMsg').textContent = '❌ Mã không đúng cho thiết bị này. Kiểm tra lại mã máy và mã kích hoạt.';
 };
 

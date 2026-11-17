@@ -75,7 +75,9 @@ function refreshMenu() {
   $('boardBox').hidden = menuMode !== 'board';
   if (menuMode === 'board') renderBoard();
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.mode === menuMode));
-  $('licBanner').innerHTML = LIC.ok ? '✅ Bản đầy đủ' : `🎁 Bản dùng thử: cấp Cơ bản, ${TRIAL_WORDS} từ · <a href="gioi-thieu.html">Xem giá & mua</a> · <a href="admin.html">Kích hoạt (bố mẹ)</a>`;
+  $('licBanner').innerHTML = LIC.ok ? '✅ Bản đầy đủ' + (LIC.exp ? ' · hạn đến ' + fmtDate(LIC.exp) : '')
+    : LIC.expired ? '⚠️ Bản đầy đủ đã hết hạn ngày ' + fmtDate(LIC.exp) + ' · <a href="admin.html">Gia hạn (bố mẹ)</a>'
+    : `🎁 Bản dùng thử: cấp Cơ bản, ${TRIAL_WORDS} từ · <a href="gioi-thieu.html">Xem giá & mua</a> · <a href="admin.html">Kích hoạt (bố mẹ)</a>`;
 }
 function showMenu() {
   if (st) clearTimeout(st.nextT);   // huỷ bước chuyển từ đang chờ nếu thoát giữa chừng
