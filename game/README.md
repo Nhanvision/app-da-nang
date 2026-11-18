@@ -25,4 +25,5 @@ Chạy: mở `index.html` (trang con) hoặc `admin.html` (trang bố mẹ) ho�
 - Địa chỉ máy chủ điền ở `ACTIVATE_URL` trong `game/config.js`. Chưa điền thì game báo "chức năng kích hoạt chưa sẵn sàng".
 - Giấy phép cũ (mã ký số theo Mã máy, `tools/tao-ma/`) vẫn dùng được cho khách đã mua trước đó.
 - Người bán lấy mã nhanh bằng trang `tools/ban-hang/` (mật khẩu người bán đặt trong Google Sheet).
+- Trang giới thiệu có **trợ lý hỏi đáp** ở góc dưới bên phải (`game/assistant.js`): trợ lý tự động theo kịch bản, trả lời giá/suất ưu đãi (lấy từ `config.js` và Google Sheet), cách mua, kích hoạt, cài app, đổi máy, v.v. Ý chưa có sẵn thì mời khách nhắn Zalo. Muốn thêm/sửa câu trả lời: sửa mảng `KB` trong file đó.
 - Điền giá/Zalo/ngân hàng trong `game/config.js`.
