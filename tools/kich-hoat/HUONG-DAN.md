@@ -9,7 +9,7 @@
 
 ## Khi bán hàng
 - Khách chuyển khoản → anh chép **một mã** ở cột A, gửi Zalo, ghi tên/Zalo khách vào cột G.
-- Khách mở game, bấm 🔑, gõ mã. Hạn 1 năm tính từ lần kích hoạt đầu. Mỗi mã dùng cho **1 máy** (sửa cột B nếu muốn cho nhiều máy hơn).
+- Khách mở game, bấm 🔑, gõ mã. Hạn 1 năm tính từ lần kích hoạt đầu. Mỗi mã dùng cho **1 máy**. Nhà có 2 điện thoại: dùng menu **Đại Dương → Tạo 20 mã mới (2 máy…)**, hoặc sửa cột B của một mã đã có thành 2 (không cần cài lại script).
 - **Khách đổi điện thoại / xoá app cài lại:** mã đang gắn với máy cũ nên máy mới sẽ báo "đã dùng đủ máy". Anh bấm vào một ô ở dòng của mã đó, chọn menu **Đại Dương → Đặt lại máy của mã đang chọn**, rồi bảo khách nhập lại mã. Hạn dùng không đổi.
 - Muốn thu hồi một mã: sửa cột B thành 0.
 - Khi sửa mã script sau này: Triển khai → **Quản lý triển khai** → sửa → Phiên bản mới (đừng tạo triển khai mới, URL sẽ đổi).

@@ -22,11 +22,12 @@ function setup() {
 
 function onOpen() {
   SpreadsheetApp.getUi().createMenu('Đại Dương')
-    .addItem('Tạo 20 mã mới', 'gen20').addItem('Tạo 50 mã mới', 'gen50')
+    .addItem('Tạo 20 mã mới (1 máy)', 'gen20').addItem('Tạo 20 mã mới (2 máy, cho nhà có 2 điện thoại)', 'gen20x2').addItem('Tạo 50 mã mới (1 máy)', 'gen50')
     .addSeparator().addItem('Đặt lại máy của mã đang chọn', 'resetDevices').addToUi();
 }
 function gen20() { generateCodes(20); }
 function gen50() { generateCodes(50); }
+function gen20x2() { generateCodes(20, 2); }
 
 // Cho khách chuyển sang máy mới: xoá danh sách máy đã kích hoạt của dòng đang chọn (hạn dùng giữ nguyên)
 function resetDevices() {
@@ -36,7 +37,7 @@ function resetDevices() {
   SpreadsheetApp.getUi().alert('Đã đặt lại máy cho mã ' + sh.getRange(row, 1).getValue() + '. Khách nhập lại mã trên máy mới là dùng được.');
 }
 
-function generateCodes(n) {
+function generateCodes(n, maxDevices) {
   const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME);
   const have = {};
   sh.getDataRange().getValues().slice(1).forEach(r => { have[norm(r[0])] = true; });
@@ -46,7 +47,7 @@ function generateCodes(n) {
     for (let i = 0; i < 8; i++) c += ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
     if (have[c]) continue;
     have[c] = true;
-    rows.push([c.slice(0, 4) + '-' + c.slice(4), DEFAULT_MAX_DEVICES, DEFAULT_DAYS, '', '', '', '']);
+    rows.push([c.slice(0, 4) + '-' + c.slice(4), maxDevices || DEFAULT_MAX_DEVICES, DEFAULT_DAYS, '', '', '', '']);
   }
   const start = sh.getLastRow() + 1;
   sh.getRange(start, 1, rows.length, 7).setValues(rows);
