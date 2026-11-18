@@ -1,6 +1,9 @@
 // Thông tin bán hàng hiển thị trong trang bố mẹ. Anh sửa các dòng dưới cho đúng thông tin của mình.
 const SHOP = {
-  price: '49.000đ (dùng 1 năm)',          // ví dụ: '199.000đ (dùng 1 năm)'
+  // Giá đang bán + ưu đãi. Khi hết 20 khách đầu: đặt price '168.000đ (dùng 1 năm)', amount 168000, priceOriginal '' và promoNote ''.
+  price: '49.000đ (dùng 1 năm)',          // giá đang bán
+  priceOriginal: '168.000đ',      // giá gốc, hiện gạch ngang khi đang ưu đãi (để '' nếu không giảm giá)
+  promoNote: 'Ưu đãi cho 20 khách đầu tiên',   // dòng ưu đãi (để '' khi hết ưu đãi)
   zalo: '0788 682 413',           // ví dụ: '0900 000 000'
   bank: 'MB Bank · 7276867687 · DANG NGOC NHAN',           // ví dụ: 'Vietcombank · 0123456789 · NGUYEN VAN A'
   note: 'Chuyển khoản rồi nhắn Zalo kèm ảnh chuyển khoản để nhận mã kích hoạt.',

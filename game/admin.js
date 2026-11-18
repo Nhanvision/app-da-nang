@@ -76,8 +76,11 @@ function renderLic() {
   $('licForm').hidden = LIC.ok;
   $('admWords').hidden = !LIC.ok;
   $('shopInfo').hidden = LIC.ok;
-  const s = [SHOP.price && 'Giá: ' + SHOP.price, SHOP.zalo && 'Zalo: ' + SHOP.zalo, SHOP.note].filter(Boolean);
-  $('shopInfo').innerHTML = s.map(t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;')).join('<br>') + '<br><a href="gioi-thieu.html#mua">Xem cách mua và mã QR chuyển khoản</a>';
+  const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const promo = SHOP.priceOriginal && SHOP.promoNote;
+  const s = [SHOP.price && 'Giá: ' + (promo ? '<s>' + esc(SHOP.priceOriginal) + '</s> ' : '') + esc(SHOP.price) + (promo ? ' · ' + esc(SHOP.promoNote) : ''),
+    SHOP.zalo && 'Zalo: ' + esc(SHOP.zalo), SHOP.note && esc(SHOP.note)].filter(Boolean);
+  $('shopInfo').innerHTML = s.join('<br>') + '<br><a href="gioi-thieu.html#mua">Xem cách mua và mã QR chuyển khoản</a>';
   if (LIC.ok) renderAdmin();
 }
 $('licGo').onclick = async () => {

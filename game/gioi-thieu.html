@@ -14,6 +14,7 @@
   <img src="icon-192.png" alt="Biểu tượng Đại Dương Từ Vựng" width="96" height="96">
   <h1>Đại Dương Từ Vựng</h1>
   <p class="sub">Game học từ vựng tiếng Anh cho bé: <b>bấm thật nhanh vào con cá mang đúng từ</b> đang bơi dưới đại dương.</p>
+  <p class="promo" id="promo" hidden></p>
   <div class="cta">
     <a class="btn" href="index.html">🎮 Chơi thử miễn phí</a>
     <a class="btn alt" href="#mua">🔑 Mở khoá bản đầy đủ</a>
@@ -38,7 +39,7 @@
       <tr><td>Cấp Trung bình, Nâng cao</td><td>🔒</td><td>✅</td></tr>
       <tr><td>Thêm từ riêng, xuất/nhập file</td><td>🔒</td><td>✅</td></tr>
       <tr><td>Học từ vựng, bảng điểm</td><td>✅</td><td>✅</td></tr>
-      <tr><td>Giá</td><td>Miễn phí</td><td><b id="price"></b></td></tr>
+      <tr><td>Giá</td><td>Miễn phí</td><td><span id="priceOld"></span> <b id="price"></b></td></tr>
     </table>
   </section>
 
@@ -77,6 +78,20 @@
 const $ = id => document.getElementById(id);
 const digits = (SHOP.zalo || '').replace(/\D/g, '');
 $('price').textContent = SHOP.price || '';
+// Ưu đãi: giá gốc gạch ngang + dòng thông báo (đặt trong config.js)
+if (SHOP.priceOriginal && SHOP.promoNote) {
+  const old = document.createElement('s'); old.textContent = SHOP.priceOriginal;
+  $('priceOld').append(old);
+  const price = (SHOP.price || '').replace(/\s*\(.*\)\s*$/, ''), unit = (SHOP.price.match(/\(.*\)/) || [''])[0];
+  const l1 = document.createElement('span'); l1.className = 'pl1';
+  const o = document.createElement('s'); o.textContent = SHOP.priceOriginal;
+  const n = document.createElement('b'); n.textContent = price;
+  l1.append(o, ' ', n, ' ' + unit);
+  const l2 = document.createElement('span'); l2.className = 'pl2';
+  l2.textContent = '🔥 ' + SHOP.promoNote + ', sau đó quay về giá gốc ' + SHOP.priceOriginal;
+  $('promo').append(l1, l2);
+  $('promo').hidden = false;
+}
 $('zaloText').textContent = SHOP.zalo || '';
 $('zaloBtn').href = digits ? 'https://zalo.me/' + digits : '#';
 $('zaloBtn').hidden = !digits;
