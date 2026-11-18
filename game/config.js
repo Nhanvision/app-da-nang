@@ -4,6 +4,8 @@ const SHOP = {
   price: '49.000đ (dùng 1 năm)',          // giá đang bán
   priceOriginal: '168.000đ',      // giá gốc, hiện gạch ngang khi đang ưu đãi (để '' nếu không giảm giá)
   promoNote: 'Ưu đãi cho 20 khách đầu tiên',   // dòng ưu đãi (để '' khi hết ưu đãi)
+  promoTotal: 20,                 // số suất ưu đãi; trang giới thiệu tự hiện "Còn X/20 suất" (đếm từ Google Sheet) và tự về giá gốc khi hết
+  priceOriginalAmount: 168000,    // số tiền giá gốc (dùng cho mã QR khi hết ưu đãi)
   zalo: '0788 682 413',           // ví dụ: '0900 000 000'
   bank: 'MB Bank · 7276867687 · DANG NGOC NHAN',           // ví dụ: 'Vietcombank · 0123456789 · NGUYEN VAN A'
   note: 'Chuyển khoản rồi nhắn Zalo kèm ảnh chuyển khoản để nhận mã kích hoạt.',

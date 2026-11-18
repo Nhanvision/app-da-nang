@@ -13,3 +13,9 @@
 - **Khách đổi điện thoại / xoá app cài lại:** mã đang gắn với máy cũ nên máy mới sẽ báo "đã dùng đủ máy". Anh bấm vào một ô ở dòng của mã đó, chọn menu **Đại Dương → Đặt lại máy của mã đang chọn**, rồi bảo khách nhập lại mã. Hạn dùng không đổi.
 - Muốn thu hồi một mã: sửa cột B thành 0.
 - Khi sửa mã script sau này: Triển khai → **Quản lý triển khai** → sửa → Phiên bản mới (đừng tạo triển khai mới, URL sẽ đổi).
+
+## Đếm "Còn X/20 suất ưu đãi" trên trang giới thiệu
+- Số suất đã bán = số dòng trong Sheet có **ghi chú khách ở cột G** hoặc **đã kích hoạt** (cột D có hạn). Vì vậy khi gửi mã cho khách, anh nhớ ghi tên/Zalo khách vào cột G.
+- Tổng số suất (20) và giá gốc đặt ở `game/config.js` (`promoTotal`, `priceOriginal`, `priceOriginalAmount`).
+- Hết suất, trang giới thiệu **tự** về giá gốc 168.000đ và mã QR tự đổi số tiền.
+- Để có tính năng này, sau khi cập nhật file `google-apps-script.gs` anh nhớ **Triển khai → Quản lý triển khai → ✏️ → Phiên bản mới → Triển khai**. Chưa cập nhật thì trang vẫn chạy, chỉ không hiện số suất.

@@ -61,9 +61,21 @@ function ymd(d) { return Utilities.formatDate(d, 'Asia/Ho_Chi_Minh', 'yyyyMMdd')
 function doGet(e) {
   const p = (e && e.parameter) || {};
   let out;
-  try { out = p.action === 'activate' ? activate(p.code, p.device) : { ok: false, reason: 'bad_request' }; }
+  try {
+    out = p.action === 'activate' ? activate(p.code, p.device)
+        : p.action === 'stats' ? stats()
+        : { ok: false, reason: 'bad_request' };
+  }
   catch (err) { out = { ok: false, reason: 'error' }; }
   return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
+}
+
+// Số mã đã bán = số dòng có ghi chú khách (cột G) hoặc đã kích hoạt (cột D). Trang giới thiệu dùng để hiện "Còn X/20 suất ưu đãi".
+function stats() {
+  const rows = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME).getDataRange().getValues();
+  let sold = 0;
+  for (let i = 1; i < rows.length; i++) if (String(rows[i][6] || '').trim() || String(rows[i][3] || '').trim()) sold++;
+  return { ok: true, sold: sold };
 }
 
 function activate(codeRaw, deviceRaw) {

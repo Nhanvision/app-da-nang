@@ -102,16 +102,42 @@ $('zaloBtn').hidden = !digits;
   if (!v) return;
   const dt = document.createElement('dt'), dd = document.createElement('dd');
   dt.textContent = k; dd.textContent = v;
+  if (k === 'Số tiền') dd.id = 'amountText';
   $('bankInfo').append(dt, dd);
 });
 
+let payAmount = SHOP.amount;   // đổi sang giá gốc khi hết suất ưu đãi
 function renderQr() {
   const phone = ($('zl').value || '').replace(/\D/g, '').slice(0, 11);
-  const q = new URLSearchParams({ amount: SHOP.amount || '', addInfo: 'DAIDUONG ' + phone, accountName: SHOP.accountName || '' });
+  const q = new URLSearchParams({ amount: payAmount || '', addInfo: 'DAIDUONG ' + phone, accountName: SHOP.accountName || '' });
   $('qr').src = `https://img.vietqr.io/image/${encodeURIComponent(SHOP.bankCode)}-${encodeURIComponent(SHOP.account)}-compact2.png?${q}`;
 }
 $('zl').oninput = renderQr;
 renderQr();
+
+// ---- Đếm suất ưu đãi còn lại từ Google Sheet (nếu máy chủ trả lời); lỗi/không có thì giữ nguyên chữ tĩnh ----
+(async function slots() {
+  if (!(SHOP.promoTotal && SHOP.priceOriginal && SHOP.promoNote && typeof ACTIVATE_URL !== 'undefined' && ACTIVATE_URL)) return;
+  let j;
+  try { j = await (await fetch(ACTIVATE_URL + '?action=stats')).json(); } catch (e) { return; }
+  if (!j || !j.ok || typeof j.sold !== 'number') return;
+  const left = Math.max(0, SHOP.promoTotal - j.sold);
+  if (left > 0) {
+    const s = document.createElement('span'); s.className = 'pl3';
+    s.textContent = '⏳ Còn ' + left + '/' + SHOP.promoTotal + ' suất ưu đãi';
+    $('promo').append(s);
+    return;
+  }
+  // Hết suất: về giá gốc (hiển thị + số tiền trong mã QR)
+  $('promo').hidden = true; $('priceOld').textContent = '';
+  const unit = (SHOP.price.match(/\(.*\)/) || [''])[0];
+  $('price').textContent = SHOP.priceOriginal + (unit ? ' ' + unit : '');
+  if (SHOP.priceOriginalAmount) {
+    payAmount = SHOP.priceOriginalAmount;
+    if ($('amountText')) $('amountText').textContent = payAmount.toLocaleString('vi-VN') + 'đ';
+    renderQr();
+  }
+})();
 </script>
 </body>
 </html>
