@@ -1,5 +1,5 @@
-const CACHE = 'daiduong-v14';
-const FILES = ['./', 'index.html', 'admin.html', 'style.css', 'admin.css', 'data.js', 'app.js', 'admin.js', 'config.js', 'gioi-thieu.html', 'landing.css', 'assistant.js', 'license.js', 'license-key.js',
+const CACHE = 'daiduong-v15';
+const FILES = ['./', 'index.html', 'admin.html', 'style.css', 'admin.css', 'data.js', 'app.js', 'admin.js', 'config.js', 'gioi-thieu.html', 'huong-dan.html', 'img/01-menu-dung-thu.webp', 'img/02-nhap-ma.webp', 'img/03-da-kich-hoat.webp', 'img/04-be-tap-noi.webp', 'img/05-choi-game.webp', 'img/06-hoc-tu.webp', 'img/07-bo-me.webp', 'landing.css', 'assistant.js', 'license.js', 'license-key.js',
   'manifest.json', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));

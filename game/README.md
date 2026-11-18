@@ -26,4 +26,5 @@ Chạy: mở `index.html` (trang con) hoặc `admin.html` (trang bố mẹ) ho�
 - Giấy phép cũ (mã ký số theo Mã máy, `tools/tao-ma/`) vẫn dùng được cho khách đã mua trước đó.
 - Người bán lấy mã nhanh bằng trang `tools/ban-hang/` (mật khẩu người bán đặt trong Google Sheet).
 - Trang giới thiệu có **trợ lý hỏi đáp** ở góc dưới bên phải (`game/assistant.js`): trợ lý tự động theo kịch bản, trả lời giá/suất ưu đãi (lấy từ `config.js` và Google Sheet), cách mua, kích hoạt, cài app, đổi máy, v.v. Ý chưa có sẵn thì mời khách nhắn Zalo. Muốn thêm/sửa câu trả lời: sửa mảng `KB` trong file đó.
+- Trang hướng dẫn có hình cho khách: `game/huong-dan.html` (ảnh chụp màn hình thật của app trong `game/img/`, hình minh hoạ cài Màn hình chính vẽ bằng SVG). Gửi một đường link này cho khách thay vì nhắn dài.
 - Điền giá/Zalo/ngân hàng trong `game/config.js`.
