@@ -19,7 +19,8 @@
     zalo: zaloUrl ? { label: '💬 Nhắn Zalo ' + SHOP.zalo, href: zaloUrl } : null,
     mua: { label: '🛒 Xem cách mua & QR', go: '#mua' },
     choi: { label: '🎮 Chơi thử miễn phí', href: GAME },
-    guide: { label: '📖 Hướng dẫn có hình', href: 'huong-dan.html' }
+    guide: { label: '📖 Hướng dẫn có hình', href: 'huong-dan.html' },
+    voice: { label: '🔇 Cách bật giọng đọc', href: 'huong-dan.html#giongdoc' }
   };
   const ask = (id, label) => ({ label, id });
 
@@ -67,6 +68,9 @@
     { id: 'huongdan', chip: 'Hướng dẫn có hình', keys: ['huong dan', 'cach dung', 'cach su dung', 'su dung', 'dung nhu the nao', 'tai lieu', 'xem hinh', 'chi dan', 'tutorial'],
       text: () => 'Mình có trang hướng dẫn từng bước kèm hình minh hoạ: mua, nhập mã, cài vào Màn hình chính, cho bé chơi, bố mẹ thêm từ riêng. Bạn mở xem nhé.',
       actions: () => [A.guide] },
+    { id: 'khongtieng', chip: 'Không nghe thấy tiếng?', keys: ['khong nghe', 'khong co tieng', 'mat tieng', 'khong doc', 'khong phat am', 'am thanh', 'loa', 'im lang', 'khong ra tieng', 'khong noi', 'cham ca khong'],
+      text: () => 'Bạn thử: tăng âm lượng (iPhone nhớ tắt chế độ im lặng), tick ô "🔊 Đọc to từ tiếng Anh" ở menu game.\nTrên một số điện thoại Android chưa có giọng đọc tiếng Anh: vào Cài đặt → Ngôn ngữ và nhập liệu → Đầu ra chuyển văn bản thành giọng nói → Google → tải giọng Tiếng Anh. Game cũng tự báo ở menu nếu máy thiếu giọng.',
+      actions: () => [A.voice, A.zalo].filter(Boolean) },
     { id: 'lienhe', chip: 'Liên hệ chủ shop', keys: ['lien he', 'zalo', 'so dien thoai', 'sdt', 'goi', 'nhan tin', 'ho tro', 'giup do', 'nguoi that', 'chu shop', 'tu van'],
       text: () => 'Bạn nhắn Zalo ' + (SHOP.zalo || '') + ' để được hỗ trợ trực tiếp nhé.',
       actions: () => [A.zalo].filter(Boolean) },

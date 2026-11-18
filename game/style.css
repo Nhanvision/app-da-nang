@@ -144,3 +144,4 @@ html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-syst
 .msg2err{min-height:1.4em;margin:8px 0;font-weight:700}
 #actPanel h2{margin:0 0 6px}
 .parentLink{margin:8px 0 0;font-size:13px}.parentLink a{color:#0a6ebd}
+.voiceWarn{margin:8px 0 0;padding:8px 10px;border-radius:12px;background:#fff1d6;color:#8a3b00;font-size:13px;font-weight:700}.voiceWarn a{color:#8a3b00}.voiceWarn[hidden]{display:none}

@@ -7,6 +7,16 @@
 <meta name="description" content="Hướng dẫn từng bước: mua mã kích hoạt, nhập mã, cài vào Màn hình chính, cho bé chơi và học từ vựng, bố mẹ thêm từ riêng.">
 <meta name="theme-color" content="#0a6ebd">
 <link rel="icon" href="icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="vi_VN">
+<meta property="og:site_name" content="Đại Dương Từ Vựng">
+<meta property="og:title" content="Hướng dẫn mua và sử dụng – Đại Dương Từ Vựng">
+<meta property="og:description" content="Làm từng bước theo hình: nhập mã kích hoạt, cài vào Màn hình chính, cho bé chơi, bố mẹ thêm từ riêng.">
+<meta property="og:url" content="https://nhanvision.github.io/app-da-nang/game/huong-dan.html">
+<meta property="og:image" content="https://nhanvision.github.io/app-da-nang/game/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="landing.css">
 <style>
 .guide-hero{padding:26px 16px 34px}
@@ -248,6 +258,11 @@ main h2.part{font-size:24px;margin:26px 0 10px;scroll-margin-top:12px}
     <h2>Các tình huống thường gặp</h2>
     <details><summary>Nhập mã báo "đang dùng trên một máy khác"</summary><p>Bạn vừa đổi điện thoại hoặc cài lại app. Nhắn Zalo cho mình, mình chuyển mã sang máy này ngay, không mất thêm phí.</p></details>
     <details><summary>Nhập mã báo "mã chưa đúng"</summary><p>Kiểm tra mã gồm 8 ký tự (chữ + số), điện thoại đang có mạng. Gõ chữ hoa hay thường đều được.</p></details>
+    <details id="giongdoc"><summary>Bé chạm cá nhưng không nghe thấy tiếng</summary><p>Bạn thử lần lượt:</p><ul>
+      <li>Tăng âm lượng. Trên iPhone, gạt công tắc bên hông để tắt chế độ im lặng.</li>
+      <li>Ở menu game, chắc ô <b>🔊 Đọc to từ tiếng Anh</b> đang được tick.</li>
+      <li><b>Android:</b> máy cần có giọng đọc tiếng Anh. Vào <b>Cài đặt → Hệ thống (hoặc Quản lý chung) → Ngôn ngữ và nhập liệu → Đầu ra chuyển văn bản thành giọng nói</b>, chọn <b>Google</b> rồi tải dữ liệu giọng <b>Tiếng Anh</b>. Tên mục có thể hơi khác tuỳ hãng máy.</li>
+      <li>Sau đó đóng hẳn game rồi mở lại.</li></ul></details>
     <details><summary>Nhà có 2 điện thoại muốn dùng chung?</summary><p>Nhắn Zalo để lấy mã loại 2 máy (cùng mức giá).</p></details>
     <details><summary>Hết 1 năm thì sao?</summary><p>Game quay về bản dùng thử, từ riêng của bạn vẫn được giữ. Nhắn Zalo để gia hạn, nhập mã mới là dùng tiếp.</p></details>
     <details><summary>Không có mạng chơi được không?</summary><p>Được. Chỉ cần mạng khi mở game lần đầu và khi nhập mã. Sau khi cài vào Màn hình chính, game chơi được cả khi không có mạng.</p></details>
@@ -265,6 +280,7 @@ const $ = id => document.getElementById(id);
 const digits = (SHOP.zalo || '').replace(/\D/g, '');
 ['zaloBtn', 'zaloBtn2'].forEach(id => { $(id).href = digits ? 'https://zalo.me/' + digits : '#'; $(id).hidden = !digits; });
 $('zaloText').textContent = $('zaloText2').textContent = SHOP.zalo || '';
+if (location.hash === '#giongdoc') { const d = $('giongdoc'); d.open = true; d.scrollIntoView(); }
 </script>
 <script src="assistant.js"></script>
 </body>

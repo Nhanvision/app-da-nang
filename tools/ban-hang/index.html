@@ -93,6 +93,7 @@ details summary{cursor:pointer;font-weight:800}
 const $ = id => document.getElementById(id);
 const KEY_STORE = 'banhang-key';
 const GAME_URL = new URL('../../game/', location.href).href;
+const GUIDE_URL = new URL('../../game/huong-dan.html', location.href).href;
 let key = '';
 try { key = localStorage.getItem(KEY_STORE) || ''; } catch (e) {}
 
@@ -140,7 +141,7 @@ function showResult(r) {
 }
 function customerMessage(code, n) {
   return 'Cảm ơn bạn đã mua Đại Dương Từ Vựng! 🎉\nMã kích hoạt của bạn: ' + code +
-    '\nCách dùng: mở game ' + GAME_URL + ' , bấm 🔑 Nhập mã kích hoạt rồi gõ mã. Dùng trong 1 năm cho ' + n + ' thiết bị.\nCần hỗ trợ bạn cứ nhắn mình qua Zalo nhé.';
+    '\nCách dùng: mở game ' + GAME_URL + ' , bấm 🔑 Nhập mã kích hoạt rồi gõ mã. Dùng trong 1 năm cho ' + n + ' thiết bị.\nHướng dẫn từng bước có hình: ' + GUIDE_URL + '\nCần hỗ trợ bạn cứ nhắn mình qua Zalo nhé.';
 }
 async function getCode(n) {
   $('get1').disabled = $('get2').disabled = true; setMsg('getMsg', 'Đang lấy mã…');

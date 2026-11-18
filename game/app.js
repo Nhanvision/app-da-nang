@@ -75,6 +75,18 @@ function sfx(name) {
   $(id).onchange = () => store.set(key, $(id).checked);
 });
 
+// Máy không có giọng đọc tiếng Anh (một số điện thoại Android): bé chạm cá mà không nghe gì -> báo cho bố mẹ cách bật
+function voiceStatus() {
+  if (!('speechSynthesis' in window)) return 'none';
+  const v = speechSynthesis.getVoices();
+  if (!v.length) return 'unknown';   // chưa tải xong danh sách giọng (hoặc máy không liệt kê): không cảnh báo
+  return v.some(x => /^en/i.test(x.lang)) ? 'ok' : 'noen';
+}
+function refreshVoiceWarn() { const s = voiceStatus(); $('voiceWarn').hidden = !(s === 'none' || s === 'noen'); }
+if ('speechSynthesis' in window) {
+  if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', refreshVoiceWarn); else speechSynthesis.onvoiceschanged = refreshVoiceWarn;
+}
+
 function speak(text, force) {
   if ((!force && !$('optSound').checked) || !('speechSynthesis' in window)) return;
   speechSynthesis.cancel();
@@ -110,6 +122,7 @@ function refreshMenu() {
     : 'Đọc nghĩa tiếng Việt, rồi <b>bấm thật nhanh vào con cá mang đúng từ tiếng Anh</b>. Càng nhanh điểm càng cao!';
   $('btnKid').hidden = !kidMode;
   $('modeHelp').textContent = { kid: 'Dành cho bé 4 tuổi: chạm cá để nghe và xem nghĩa.', play: 'Chọn cấp độ để chơi:', study: 'Chọn cấp độ để học các từ trước khi chơi:', board: 'Top 10 điểm cao nhất của từng cấp độ:' }[menuMode];
+  refreshVoiceWarn();
   const nHard = hardWords().length;
   $('btnReview').hidden = menuMode === 'board' || kidMode || !nHard;
   $('btnReview').textContent = (menuMode === 'study' ? '📌 Học các từ hay sai · ' : '🧠 Ôn từ hay sai · ') + nHard + ' từ';
