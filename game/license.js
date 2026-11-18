@@ -78,7 +78,7 @@ async function activateByCode(raw) {
 function actMessage(res) {
   return ({
     invalid: '❌ Mã chưa đúng. Bạn kiểm tra lại mã (8 ký tự, dạng XXXX-XXXX) nhé.',
-    full: '⚠️ Mã này đã dùng đủ số máy cho phép. Nhắn người bán để được hỗ trợ.',
+    full: '⚠️ Mã này đang dùng trên một máy khác. Nếu bạn vừa đổi máy hoặc cài lại app, nhắn người bán để chuyển mã sang máy này nhé.',
     expired: '⌛ Mã này đã hết hạn' + (res.exp ? ' (' + fmtDate(res.exp) + ')' : '') + '. Nhắn người bán để lấy mã mới.',
     offline: '📶 Không kết nối được mạng. Bạn bật mạng rồi thử lại nhé.',
     noserver: '⚙️ Chức năng kích hoạt chưa sẵn sàng. Bạn nhắn người bán giúp nhé.'

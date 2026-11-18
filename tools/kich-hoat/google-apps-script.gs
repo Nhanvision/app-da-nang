@@ -4,12 +4,13 @@
  *   A Mã | B Số máy tối đa | C Số ngày dùng | D Hết hạn (YYYYMMDD) | E Các máy | F Ngày kích hoạt đầu | G Ghi chú
  * Khách gõ mã ngắn (8 ký tự) trong app -> app gọi ?action=activate&code=...&device=...
  *  - Lần kích hoạt đầu: tính hạn = hôm nay + số ngày dùng (mặc định 365).
- *  - Mỗi mã dùng tối đa N máy (mặc định 3); máy cũ nhập lại không tốn thêm lượt.
+ *  - Mỗi mã dùng tối đa N máy (mặc định 1); máy cũ nhập lại không tốn thêm lượt.
+ *  - Khách đổi máy / cài lại app: chọn dòng của mã trong Sheet rồi bấm menu Đại Dương > Đặt lại máy của mã đang chọn.
  * Triển khai: Deploy > New deployment > Web app > Execute as: Me > Who has access: Anyone.
  */
 const SHEET_NAME = 'Codes';
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';   // bỏ 0 1 O I cho dễ đọc
-const DEFAULT_MAX_DEVICES = 3, DEFAULT_DAYS = 365;
+const DEFAULT_MAX_DEVICES = 1, DEFAULT_DAYS = 365;
 
 function setup() {
   const ss = SpreadsheetApp.getActive();
@@ -21,10 +22,19 @@ function setup() {
 
 function onOpen() {
   SpreadsheetApp.getUi().createMenu('Đại Dương')
-    .addItem('Tạo 20 mã mới', 'gen20').addItem('Tạo 50 mã mới', 'gen50').addToUi();
+    .addItem('Tạo 20 mã mới', 'gen20').addItem('Tạo 50 mã mới', 'gen50')
+    .addSeparator().addItem('Đặt lại máy của mã đang chọn', 'resetDevices').addToUi();
 }
 function gen20() { generateCodes(20); }
 function gen50() { generateCodes(50); }
+
+// Cho khách chuyển sang máy mới: xoá danh sách máy đã kích hoạt của dòng đang chọn (hạn dùng giữ nguyên)
+function resetDevices() {
+  const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME), row = sh.getActiveRange().getRow();
+  if (row < 2) { SpreadsheetApp.getUi().alert('Hãy chọn một ô nằm ở dòng của mã cần đặt lại (từ dòng 2 trở xuống).'); return; }
+  sh.getRange(row, 5).setValue('');
+  SpreadsheetApp.getUi().alert('Đã đặt lại máy cho mã ' + sh.getRange(row, 1).getValue() + '. Khách nhập lại mã trên máy mới là dùng được.');
+}
 
 function generateCodes(n) {
   const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME);
