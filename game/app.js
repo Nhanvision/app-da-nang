@@ -75,8 +75,8 @@ function sfx(name) {
   $(id).onchange = () => store.set(key, $(id).checked);
 });
 
-function speak(text) {
-  if (!$('optSound').checked || !('speechSynthesis' in window)) return;
+function speak(text, force) {
+  if ((!force && !$('optSound').checked) || !('speechSynthesis' in window)) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'en-US'; u.rate = 0.85;
@@ -94,7 +94,7 @@ setInterval(() => {
 }, 700);
 
 // ---------- menu ----------
-let menuMode = 'play';   // 'play' | 'study'
+let menuMode = 'kid';   // 'kid' | 'play' | 'study' | 'board'
 document.querySelectorAll('.tab').forEach(t => t.onclick = () => { menuMode = t.dataset.mode; refreshMenu(); });
 function refreshMenu() {
   for (const l in LEVELS) {
@@ -104,11 +104,16 @@ function refreshMenu() {
     $('cnt-' + l).textContent = locked ? `📚 ${c.full} từ trong bản đầy đủ`
       : `📚 ${c.total} từ` + (c.added ? ` (có ${c.added} từ bố mẹ thêm)` : '');
   }
-  $('modeHelp').textContent = { play: 'Chọn cấp độ để chơi:', study: 'Chọn cấp độ để học các từ trước khi chơi:', board: 'Top 10 điểm cao nhất của từng cấp độ:' }[menuMode];
+  const kidMode = menuMode === 'kid';
+  $('intro').innerHTML = kidMode
+    ? 'Bé chạm vào con cá nào, cá sẽ <b>đọc to từ tiếng Anh</b> và hiện <b>nghĩa tiếng Việt</b>. Không có điểm, không bị thua!'
+    : 'Đọc nghĩa tiếng Việt, rồi <b>bấm thật nhanh vào con cá mang đúng từ tiếng Anh</b>. Càng nhanh điểm càng cao!';
+  $('btnKid').hidden = !kidMode;
+  $('modeHelp').textContent = { kid: 'Dành cho bé 4 tuổi: chạm cá để nghe và xem nghĩa.', play: 'Chọn cấp độ để chơi:', study: 'Chọn cấp độ để học các từ trước khi chơi:', board: 'Top 10 điểm cao nhất của từng cấp độ:' }[menuMode];
   const nHard = hardWords().length;
-  $('btnReview').hidden = menuMode === 'board' || !nHard;
+  $('btnReview').hidden = menuMode === 'board' || kidMode || !nHard;
   $('btnReview').textContent = (menuMode === 'study' ? '📌 Học các từ hay sai · ' : '🧠 Ôn từ hay sai · ') + nHard + ' từ';
-  $('levelsBox').hidden = menuMode === 'board';
+  $('levelsBox').hidden = menuMode === 'board' || kidMode;
   $('boardBox').hidden = menuMode !== 'board';
   if (menuMode === 'board') renderBoard();
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.mode === menuMode));
@@ -119,6 +124,7 @@ function refreshMenu() {
 function showMenu() {
   if (st) clearTimeout(st.nextT);   // huỷ bước chuyển từ đang chờ nếu thoát giữa chừng
   stopLoop(); clearFish(); delete $('sea').dataset.lvl;
+  kid = null; clearTimeout(kidCardT); $('kidCard').hidden = true; $('hud').classList.remove('kid'); layer.classList.remove('kid');
   $('menu').hidden = false; $('result').hidden = true; $('hud').hidden = true; $('study').hidden = true;
   refreshMenu();
 }
@@ -206,6 +212,76 @@ $('btnAgain').onclick = () => {
   startGame(st.lvl);
 };
 
+// ---------- chế độ bé tập nói: chạm cá → đọc tiếng Anh + hiện nghĩa tiếng Việt ----------
+let kid = null, kidCardT = 0;   // { deck, fish }
+$('btnKid').onclick = startKid;
+function kidWord() {   // lấy từ kế tiếp trong bộ bài đã trộn, tránh trùng từ đang bơi
+  if (!kid.deck.length) kid.deck = shuffle(kid.pool);
+  const onScreen = new Set(kid.fish.map(f => f.word));
+  const i = kid.deck.findIndex(w => !onScreen.has(w));
+  return kid.deck.splice(i < 0 ? 0 : i, 1)[0];
+}
+function startKid() {
+  if (st) clearTimeout(st.nextT);
+  st = null; stopLoop(); clearFish();
+  const pool = getPool('basic').filter(w => w[2]);   // chỉ từ có hình cho bé dễ hiểu
+  if (pool.length < 3) return alert('Chưa đủ từ có hình để bé chơi.');
+  kid = { pool, deck: shuffle(pool), fish: [], n: Math.min(layer.clientHeight < 520 ? 4 : 5, pool.length) };
+  $('sea').dataset.lvl = 'basic';
+  $('menu').hidden = true; $('result').hidden = true; $('hud').hidden = false;
+  $('hud').classList.add('kid'); layer.classList.add('kid');
+  for (let i = 0; i < kid.n; i++) spawnKidFish(i, false);
+  lastT = performance.now();
+  rafId = requestAnimationFrame(kidLoop);
+}
+function spawnKidFish(lane, fromEdge) {
+  const w = kidWord(), dir = Math.random() < 0.5 ? 1 : -1;
+  const el = document.createElement('div');
+  el.className = 'fish ' + (dir > 0 ? 'right' : 'left');
+  const W = Math.max(140, Math.round(w[0].length * 16 + 72));
+  el.innerHTML = `<div class="in">${fishSVG(W, COLORS[(Math.random() * COLORS.length) | 0], (Math.random() * 3) | 0)}<span class="lbl">${w[0]}</span></div>`;
+  el.style.width = W + 'px'; el.style.height = '78px';
+  layer.appendChild(el);
+  const LW = layer.clientWidth, H = layer.clientHeight, top = 80, bottom = 130, laneH = (H - top - bottom) / kid.n;
+  const f = {
+    el, word: w, dir, w: W, lane,
+    x: fromEdge ? (dir > 0 ? -W - 10 : LW + 10) : rand(0, Math.max(10, LW - W)),
+    baseY: top + laneH * lane + laneH / 2 - 39, amp: Math.min(10, laneH / 4), ph: rand(0, 6.28),
+    v: 40 * rand(0.85, 1.2)
+  };
+  el.onclick = () => onKidPick(f);
+  kid.fish.push(f);
+  place(f, 0);
+}
+function onKidPick(f) {
+  if (!kid || f.dead) return;
+  f.dead = true;
+  const [en, vi, emoji] = f.word;
+  speak(en, true); sfx('ok');
+  $('kcEmoji').textContent = emoji; $('kcEn').textContent = en; $('kcVi').textContent = vi;
+  const c = $('kidCard'); c.hidden = false; c.classList.remove('show'); void c.offsetWidth; c.classList.add('show');
+  clearTimeout(kidCardT); kidCardT = setTimeout(() => { c.hidden = true; }, 2200);
+  f.el.classList.add('ok');
+  const k = kid;
+  setTimeout(() => {
+    if (kid !== k) return;
+    f.el.remove(); k.fish.splice(k.fish.indexOf(f), 1);
+    spawnKidFish(f.lane, true);   // cá mới bơi vào thay chỗ
+  }, 450);
+}
+function kidLoop(now) {
+  const dt = Math.min(0.05, (now - lastT) / 1000), W = layer.clientWidth;
+  lastT = now;
+  for (const f of kid.fish) {
+    if (f.dead) continue;
+    f.x += f.dir * f.v * dt;
+    if (f.dir > 0 && f.x > W + 20) f.x = -f.w - 20;
+    if (f.dir < 0 && f.x < -f.w - 20) f.x = W + 20;
+    place(f, now / 1000);
+  }
+  rafId = requestAnimationFrame(kidLoop);
+}
+
 // ---------- ván chơi ----------
 function startGame(lvl) {
   if (st) clearTimeout(st.nextT);
@@ -246,7 +322,7 @@ function nextWord() {
   updateHud();
 }
 
-function clearFish() { layer.innerHTML = ''; if (st) st.fish = []; }
+function clearFish() { layer.innerHTML = ''; if (st) st.fish = []; if (kid) kid.fish = []; }
 
 function spawnFish(w, i, n) {
   const el = document.createElement('div');

@@ -24,15 +24,17 @@
   <!-- MENU -->
   <section id="menu" class="panel">
     <h1>🌊 Đại Dương Từ Vựng</h1>
-    <p>Đọc nghĩa tiếng Việt, rồi <b>bấm thật nhanh vào con cá mang đúng từ tiếng Anh</b>. Càng nhanh điểm càng cao!</p>
+    <p id="intro"></p>
     <p id="licBanner" class="lic"></p>
     <div class="tabs">
-      <button class="tab on" data-mode="play">🎮 Chơi game</button>
+      <button class="tab on" data-mode="kid">🐣 Bé tập nói</button>
+      <button class="tab" data-mode="play">🎮 Chơi game</button>
       <button class="tab" data-mode="study">📖 Học từ vựng</button>
       <button class="tab" data-mode="board">🏆 Bảng điểm</button>
     </div>
     <p id="modeHelp" class="hint2"></p>
     <button id="btnReview" class="reviewBtn" hidden></button>
+    <button id="btnKid" class="kidBtn" hidden>🐠 Bé bắt đầu nào!</button>
     <div id="boardBox" hidden></div>
     <div class="levels" id="levelsBox">
       <button class="lvl" data-lvl="basic"><span>🐠</span><b>Cơ bản</b><small>Từ quen thuộc, có hình · cá bơi chậm</small><i id="cnt-basic"></i><em id="best-basic"></em></button>
@@ -66,6 +68,8 @@
     </div>
     <div id="stList"></div>
   </section>
+
+  <div id="kidCard" hidden><div id="kcEmoji"></div><div id="kcEn"></div><div id="kcVi"></div></div>
 
   <!-- HUD -->
   <div id="hud" hidden>
