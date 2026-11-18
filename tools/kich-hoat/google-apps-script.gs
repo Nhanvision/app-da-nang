@@ -11,6 +11,8 @@
 const SHEET_NAME = 'Codes';
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';   // bỏ 0 1 O I cho dễ đọc
 const DEFAULT_MAX_DEVICES = 1, DEFAULT_DAYS = 365;
+// Số máy tối đa của một dòng: ô trống hoặc không phải số (ví dụ gõ chữ "x") -> coi là 1 máy, KHÔNG bao giờ là không giới hạn. Số 0 = thu hồi mã.
+function maxDev(v) { const n = Number(v); return (v !== '' && isFinite(n) && n >= 0) ? n : DEFAULT_MAX_DEVICES; }
 
 function setup() {
   const ss = SpreadsheetApp.getActive();
@@ -89,7 +91,7 @@ function sellerCounts(rows) {
   let left1 = 0, left2 = 0;
   for (let i = 1; i < rows.length; i++) {
     if (String(rows[i][6] || '').trim() || String(rows[i][3] || '').trim() || !rows[i][0]) continue;
-    const m = rows[i][1] === '' ? DEFAULT_MAX_DEVICES : Number(rows[i][1]);
+    const m = maxDev(rows[i][1]);
     if (m === 1) left1++; else if (m === 2) left2++;
   }
   return { left1: left1, left2: left2 };
@@ -102,7 +104,7 @@ function sellerNext(maxDevices, note) {
     const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME), rows = sh.getDataRange().getValues();
     for (let i = 1; i < rows.length; i++) {
       if (!rows[i][0] || String(rows[i][6] || '').trim() || String(rows[i][3] || '').trim()) continue;
-      const m = rows[i][1] === '' ? DEFAULT_MAX_DEVICES : Number(rows[i][1]);
+      const m = maxDev(rows[i][1]);
       if (m !== maxDevices) continue;
       const stamp = note || ('Đã gửi ' + Utilities.formatDate(new Date(), 'Asia/Ho_Chi_Minh', 'dd/MM HH:mm'));
       sh.getRange(i + 1, 7).setValue(stamp);
@@ -119,7 +121,7 @@ function sellerList() {
     const note = String(rows[i][6] || '').trim(), exp = String(rows[i][3] || '').trim();
     if (!note && !exp) continue;
     const devs = String(rows[i][4] || '').split(',').filter(Boolean).length;
-    items.push({ code: String(rows[i][0]), note: note, maxDevices: Number(rows[i][1]) || DEFAULT_MAX_DEVICES, activated: !!exp, exp: exp, devices: devs });
+    items.push({ code: String(rows[i][0]), note: note, maxDevices: maxDev(rows[i][1]), activated: !!exp, exp: exp, devices: devs });
   }
   return Object.assign({ ok: true, items: items }, sellerCounts(rows));
 }
@@ -183,7 +185,7 @@ function activate(codeRaw, deviceRaw) {
     const rows = sh.getDataRange().getValues();
     for (let i = 1; i < rows.length; i++) {
       if (norm(rows[i][0]) !== code) continue;
-      const max = rows[i][1] === '' ? DEFAULT_MAX_DEVICES : Number(rows[i][1]);
+      const max = maxDev(rows[i][1]);
       const days = Number(rows[i][2]) || DEFAULT_DAYS;
       const devs = String(rows[i][4] || '').split(',').map(s => s.trim()).filter(Boolean);
       let exp = String(rows[i][3] || '').trim();
