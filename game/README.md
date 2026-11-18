@@ -24,4 +24,5 @@ Chạy: mở `index.html` (trang con) hoặc `admin.html` (trang bố mẹ) ho�
 - Mã được kiểm tra bởi một Google Sheet + Apps Script (`tools/kich-hoat/`, xem `HUONG-DAN.md`): hạn 1 năm tính từ lần kích hoạt đầu, mỗi mã dùng cho 1 thiết bị (đổi máy: menu Sheet "Đặt lại máy của mã đang chọn"); thu hồi bằng cách sửa cột "Số máy tối đa" về 0.
 - Địa chỉ máy chủ điền ở `ACTIVATE_URL` trong `game/config.js`. Chưa điền thì game báo "chức năng kích hoạt chưa sẵn sàng".
 - Giấy phép cũ (mã ký số theo Mã máy, `tools/tao-ma/`) vẫn dùng được cho khách đã mua trước đó.
+- Người bán lấy mã nhanh bằng trang `tools/ban-hang/` (mật khẩu người bán đặt trong Google Sheet).
 - Điền giá/Zalo/ngân hàng trong `game/config.js`.

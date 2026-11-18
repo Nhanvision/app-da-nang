@@ -19,3 +19,18 @@
 - Tổng số suất (20) và giá gốc đặt ở `game/config.js` (`promoTotal`, `priceOriginal`, `priceOriginalAmount`).
 - Hết suất, trang giới thiệu **tự** về giá gốc 168.000đ và mã QR tự đổi số tiền.
 - Để có tính năng này, sau khi cập nhật file `google-apps-script.gs` anh nhớ **Triển khai → Quản lý triển khai → ✏️ → Phiên bản mới → Triển khai**. Chưa cập nhật thì trang vẫn chạy, chỉ không hiện số suất.
+
+## Trang lấy mã nhanh cho người bán (`tools/ban-hang`)
+Một trang riêng trên điện thoại/máy tính: bấm một nút là nhận **mã chưa phát tiếp theo (từ trên xuống dưới trong Sheet)**, kèm tin nhắn mẫu để chép gửi khách.
+
+Cài một lần:
+1. Dán lại toàn bộ `google-apps-script.gs` mới vào Apps Script, bấm 💾, rồi **Triển khai → Quản lý triển khai → ✏️ → Phiên bản mới → Triển khai** (giữ nguyên URL).
+2. Tải lại trang Sheet, vào menu **Đại Dương → Đặt mật khẩu người bán**, đặt mật khẩu (từ 8 ký tự, khác mật khẩu Google). Mật khẩu này lưu trong Script Properties, **không nằm trong mã nguồn hay trên GitHub**.
+3. Mở trang `https://nhanvision.github.io/app-da-nang/tools/ban-hang/` (sau khi đã đưa lên GitHub), nhập mật khẩu một lần, thêm vào Màn hình chính cho tiện.
+
+Dùng hằng ngày:
+- Ghi tên/Zalo khách (không bắt buộc) → bấm **Lấy mã 1 máy** hoặc **Lấy mã 2 máy** → **Chép tin nhắn gửi khách** rồi dán vào Zalo.
+- Mã vừa lấy được ghi vào cột G của Sheet (tính là đã bán, trừ vào số suất ưu đãi). Lấy nhầm thì bấm **Huỷ lấy** ở danh sách để trả mã về kho.
+- Mục "Mã đã phát gần đây" cho thấy mã nào khách đã kích hoạt, hạn dùng, đang dùng mấy máy. Khách đổi máy: bấm **Đặt lại máy**.
+- Sắp hết mã: mở "Tạo thêm mã mới trong Sheet".
+

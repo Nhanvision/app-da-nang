@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lấy mã kích hoạt</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a6ebd">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="../../game/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lấy mã">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#0a4a82;background:#f3f8fd;line-height:1.45}
+main{max-width:560px;margin:0 auto;padding:16px 14px 60px}
+h1{font-size:22px;margin:6px 0 12px}
+.card{background:#fff;border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 3px 10px rgba(10,74,130,.12)}
+label{display:block;font-weight:700;margin:0 0 4px;font-size:14px}
+input,select{font:inherit;width:100%;padding:11px;border:2px solid #9ec5e6;border-radius:12px;background:#fff;color:#0a4a82}
+button{font:inherit;font-weight:800;border:0;border-radius:14px;padding:12px 16px;cursor:pointer;background:#0a6ebd;color:#fff}
+button.alt{background:#7aa7c9}button.warn{background:#d9453d}button.small{padding:7px 12px;font-size:14px;border-radius:10px}
+button:disabled{opacity:.5}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.two button{padding:16px 8px;font-size:17px}.two small{display:block;font-weight:700;opacity:.9;font-size:13px}
+.code{font-size:40px;font-weight:900;letter-spacing:3px;text-align:center;margin:8px 0;color:#0a6ebd;user-select:all}
+.msg{min-height:1.4em;margin:8px 0 0;font-weight:700}.err{color:#d9453d}.ok{color:#2b8a3e}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
+.item{border-top:1px solid #e1eefa;padding:10px 0}.item:first-child{border-top:0}
+.item b{font-size:18px;letter-spacing:1px}.item .meta{font-size:13px;opacity:.8}
+.badge{display:inline-block;border-radius:8px;padding:1px 8px;font-size:12px;font-weight:800;margin-left:6px}
+.badge.new{background:#fff1d6;color:#8a5a00}.badge.act{background:#d9f5e3;color:#1c6b3a}
+details summary{cursor:pointer;font-weight:800}
+.meta{font-size:13px;opacity:.85}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>🔑 Lấy mã kích hoạt</h1>
+
+<section class="card" id="keyBox" hidden>
+  <label for="key">Mật khẩu người bán</label>
+  <input id="key" type="password" autocomplete="current-password" placeholder="Mật khẩu đã đặt trong Google Sheet">
+  <div class="row" style="margin-top:10px"><button id="keyOk">Vào</button></div>
+  <p class="msg err" id="keyMsg"></p>
+</section>
+
+<div id="app" hidden>
+  <section class="card">
+    <label for="note">Tên / Zalo khách (ghi vào Sheet, không bắt buộc)</label>
+    <input id="note" placeholder="Ví dụ: Lan 0901 234 567" autocomplete="off">
+    <div class="two">
+      <button id="get1">Lấy mã 1 máy<small id="left1"></small></button>
+      <button id="get2" class="alt">Lấy mã 2 máy<small id="left2"></small></button>
+    </div>
+    <p class="msg" id="getMsg"></p>
+  </section>
+
+  <section class="card" id="result" hidden>
+    <div class="meta" id="resMeta"></div>
+    <div class="code" id="resCode"></div>
+    <div class="row">
+      <button id="copyCode">Chép mã</button>
+      <button id="copyMsg" class="alt">Chép tin nhắn gửi khách</button>
+    </div>
+    <p class="msg" id="copyOk"></p>
+  </section>
+
+  <section class="card">
+    <b>Mã đã phát gần đây</b>
+    <div id="list"><p class="meta">Đang tải…</p></div>
+  </section>
+
+  <section class="card">
+    <details>
+      <summary>Tạo thêm mã mới trong Sheet</summary>
+      <div class="row" style="margin-top:10px">
+        <select id="genType"><option value="1">Loại 1 máy</option><option value="2">Loại 2 máy</option></select>
+        <select id="genN"><option>20</option><option>50</option><option>10</option></select>
+      </div>
+      <div class="row" style="margin-top:10px"><button id="gen" class="alt">Tạo thêm</button></div>
+      <p class="msg" id="genMsg"></p>
+    </details>
+  </section>
+  <p class="meta"><button class="small alt" id="logout">Đổi mật khẩu / thoát</button></p>
+</div>
+</main>
+
+<script src="../../game/config.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const KEY_STORE = 'banhang-key';
+const GAME_URL = new URL('../../game/', location.href).href;
+let key = '';
+try { key = localStorage.getItem(KEY_STORE) || ''; } catch (e) {}
+
+const ERR = {
+  no_key: 'Chưa đặt mật khẩu người bán. Trong Google Sheet: menu Đại Dương → Đặt mật khẩu người bán.',
+  bad_key: 'Sai mật khẩu.',
+  empty: 'Đã hết mã loại này. Mở mục "Tạo thêm mã mới" bên dưới.',
+  activated: 'Mã này khách đã kích hoạt nên không huỷ được.',
+  invalid: 'Không tìm thấy mã.',
+  bad_request: 'Yêu cầu không hợp lệ.',
+  error: 'Máy chủ báo lỗi, thử lại sau ít phút.'
+};
+async function call(body) {
+  if (typeof ACTIVATE_URL === 'undefined' || !ACTIVATE_URL) return { ok: false, reason: 'no_url' };
+  let text;
+  try { text = await (await fetch(ACTIVATE_URL, { method: 'POST', body: JSON.stringify({ key, ...body }) })).text(); }
+  catch (e) { return { ok: false, reason: 'offline' }; }
+  try { return JSON.parse(text); } catch (e) { return { ok: false, reason: 'old_server' }; }
+}
+function errText(r) {
+  if (r.reason === 'offline') return 'Không kết nối được mạng.';
+  if (r.reason === 'no_url') return 'Chưa có địa chỉ máy chủ trong game/config.js.';
+  if (r.reason === 'old_server') return 'Máy chủ chưa cập nhật bản mới: dán lại script vào Apps Script rồi Triển khai → Phiên bản mới.';
+  return ERR[r.reason] || 'Có lỗi, thử lại.';
+}
+function setMsg(id, text, cls) { const e = $(id); e.textContent = text || ''; e.className = 'msg ' + (cls || ''); }
+const fmtDate = ymd => /^\d{8}$/.test(ymd) ? ymd.slice(6) + '/' + ymd.slice(4, 6) + '/' + ymd.slice(0, 4) : ymd;
+async function copy(text, okId) {
+  try { await navigator.clipboard.writeText(text); setMsg(okId, '✔ Đã chép', 'ok'); }
+  catch (e) { setMsg(okId, 'Không chép tự động được, hãy bôi đen và chép tay.', 'err'); }
+}
+function showCounts(r) {
+  if (typeof r.left1 === 'number') $('left1').textContent = 'còn ' + r.left1 + ' mã';
+  if (typeof r.left2 === 'number') $('left2').textContent = 'còn ' + r.left2 + ' mã';
+}
+
+let lastCode = null;
+function showResult(r) {
+  lastCode = r;
+  $('result').hidden = false;
+  $('resCode').textContent = r.code;
+  $('resMeta').textContent = 'Mã ' + r.maxDevices + ' máy · ghi chú: ' + r.note;
+  setMsg('copyOk', '');
+  $('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function customerMessage(code, n) {
+  return 'Cảm ơn bạn đã mua Đại Dương Từ Vựng! 🎉\nMã kích hoạt của bạn: ' + code +
+    '\nCách dùng: mở game ' + GAME_URL + ' , bấm 🔑 Nhập mã kích hoạt rồi gõ mã. Dùng trong 1 năm cho ' + n + ' thiết bị.\nCần hỗ trợ bạn cứ nhắn mình qua Zalo nhé.';
+}
+async function getCode(n) {
+  $('get1').disabled = $('get2').disabled = true; setMsg('getMsg', 'Đang lấy mã…');
+  const r = await call({ action: 'next', maxDevices: n, note: $('note').value.trim() });
+  $('get1').disabled = $('get2').disabled = false;
+  if (r.ok) { setMsg('getMsg', ''); $('note').value = ''; showCounts(r); showResult(r); loadList(); }
+  else { setMsg('getMsg', errText(r), 'err'); showCounts(r); if (r.reason === 'bad_key') showKey(); }
+}
+$('get1').onclick = () => getCode(1);
+$('get2').onclick = () => getCode(2);
+$('copyCode').onclick = () => lastCode && copy(lastCode.code, 'copyOk');
+$('copyMsg').onclick = () => lastCode && copy(customerMessage(lastCode.code, lastCode.maxDevices), 'copyOk');
+
+function copyBtn(btn, text, label) {
+  btn.onclick = () => { navigator.clipboard.writeText(text).then(() => btn.textContent = '✔ Đã chép', () => btn.textContent = 'Chép tay'); setTimeout(() => btn.textContent = label, 1800); };
+}
+async function loadList() {
+  const r = await call({ action: 'list' });
+  const box = $('list'); box.textContent = '';
+  if (!r.ok) { const p = document.createElement('p'); p.className = 'msg err'; p.textContent = errText(r); box.append(p); if (r.reason === 'bad_key') showKey(); return; }
+  showCounts(r);
+  if (!r.items.length) { const p = document.createElement('p'); p.className = 'meta'; p.textContent = 'Chưa phát mã nào.'; box.append(p); return; }
+  r.items.forEach(it => {
+    const d = document.createElement('div'); d.className = 'item';
+    const top = document.createElement('div');
+    const b = document.createElement('b'); b.textContent = it.code;
+    const badge = document.createElement('span'); badge.className = 'badge ' + (it.activated ? 'act' : 'new');
+    badge.textContent = it.activated ? 'Đã kích hoạt' : 'Chưa kích hoạt';
+    top.append(b, badge);
+    const meta = document.createElement('div'); meta.className = 'meta';
+    meta.textContent = (it.note || '') + ' · ' + it.maxDevices + ' máy' + (it.activated ? ' · hạn ' + fmtDate(it.exp) + ' · đang dùng ' + it.devices + '/' + it.maxDevices + ' máy' : '');
+    const row = document.createElement('div'); row.className = 'row'; row.style.marginTop = '6px';
+    const c1 = document.createElement('button'); c1.className = 'small'; c1.textContent = 'Chép mã'; copyBtn(c1, it.code, 'Chép mã');
+    const c2 = document.createElement('button'); c2.className = 'small alt'; c2.textContent = 'Chép tin nhắn'; copyBtn(c2, customerMessage(it.code, it.maxDevices), 'Chép tin nhắn');
+    row.append(c1, c2);
+    if (it.activated) {
+      const rs = document.createElement('button'); rs.className = 'small warn'; rs.textContent = 'Đặt lại máy';
+      rs.onclick = async () => { if (!confirm('Đặt lại máy cho mã ' + it.code + '? Khách nhập lại mã trên máy mới là dùng được.')) return; const x = await call({ action: 'reset', code: it.code }); alert(x.ok ? 'Đã đặt lại máy.' : errText(x)); loadList(); };
+      row.append(rs);
+    } else {
+      const un = document.createElement('button'); un.className = 'small warn'; un.textContent = 'Huỷ lấy';
+      un.onclick = async () => { if (!confirm('Huỷ việc lấy mã ' + it.code + '? Mã quay lại kho (khi lấy nhầm).')) return; const x = await call({ action: 'unissue', code: it.code }); alert(x.ok ? 'Đã trả mã về kho.' : errText(x)); loadList(); };
+      row.append(un);
+    }
+    d.append(top, meta, row); box.append(d);
+  });
+}
+$('gen').onclick = async () => {
+  $('gen').disabled = true; setMsg('genMsg', 'Đang tạo…');
+  const r = await call({ action: 'gen', n: +$('genN').value, maxDevices: +$('genType').value });
+  $('gen').disabled = false;
+  if (r.ok) { setMsg('genMsg', '✔ Đã tạo thêm mã trong Sheet.', 'ok'); showCounts(r); } else setMsg('genMsg', errText(r), 'err');
+};
+
+function showKey() { $('keyBox').hidden = false; $('app').hidden = true; $('key').focus(); }
+function showApp() { $('keyBox').hidden = true; $('app').hidden = false; loadList(); }
+$('keyOk').onclick = async () => {
+  key = $('key').value.trim();
+  if (key.length < 8) return setMsg('keyMsg', 'Mật khẩu có ít nhất 8 ký tự.', 'err');
+  setMsg('keyMsg', 'Đang kiểm tra…');
+  const r = await call({ action: 'list' });
+  if (!r.ok) return setMsg('keyMsg', errText(r), 'err');
+  try { localStorage.setItem(KEY_STORE, key); } catch (e) {}
+  $('key').value = ''; setMsg('keyMsg', ''); showApp();
+};
+$('key').onkeydown = e => { if (e.key === 'Enter') $('keyOk').click(); };
+$('logout').onclick = () => { try { localStorage.removeItem(KEY_STORE); } catch (e) {} key = ''; showKey(); };
+if (key) showApp(); else showKey();
+</script>
+</body>
+</html>
