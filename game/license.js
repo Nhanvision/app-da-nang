@@ -14,6 +14,11 @@ function getDeviceId() {
   }
   return id;
 }
+// iPhone/iPad: trang mở trong Safari và app ở Màn hình chính lưu dữ liệu TÁCH BIỆT, nên mỗi nơi có một Mã máy riêng.
+// Để khách không lấy nhầm Mã máy của tab Safari (rồi mất kích hoạt khi cài app), trên iOS chỉ app đã cài mới được lấy Mã máy và kích hoạt.
+function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+function isStandalone() { return navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches); }
+const needInstall = () => isIOS() && !isStandalone();
 const fmtDeviceId = id => id.match(/.{4}/g).join('-');
 const fmtDate = ymd => ymd.slice(6, 8) + '/' + ymd.slice(4, 6) + '/' + ymd.slice(0, 4);
 const todayYmd = () => { const d = new Date(); return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0'); };
@@ -48,8 +53,9 @@ const licReady = (async () => {
   applyLicense(code ? await checkCode(code, getDeviceId()) : { valid: false });
 })();
 
-// Trả về 'ok' | 'expired' (mã đúng nhưng đã quá hạn) | 'invalid'
+// Trả về 'ok' | 'expired' (mã đúng nhưng đã quá hạn) | 'invalid' | 'install' (iOS, chưa mở từ app ở Màn hình chính)
 async function activateCode(raw) {
+  if (needInstall()) return 'install';   // iOS: chỉ kích hoạt trong app đã thêm vào Màn hình chính
   const code = String(raw).replace(/\s+/g, '');
   if (!code) return 'invalid';
   const r = await checkCode(code, getDeviceId());

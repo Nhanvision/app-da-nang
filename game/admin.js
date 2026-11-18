@@ -73,10 +73,13 @@ function renderLic() {
     ? '✅ <b>Đã kích hoạt bản đầy đủ</b>' + (LIC.exp ? ' · còn hạn đến <b>' + fmtDate(LIC.exp) + '</b>' : ' (không hết hạn)') + '.'
     : LIC.expired ? '⚠️ Bản đầy đủ <b>đã hết hạn ngày ' + fmtDate(LIC.exp) + '</b>. Nhập mã gia hạn mới để dùng tiếp (từ riêng của bố mẹ vẫn được giữ).'
     : '🎁 Đang dùng bản dùng thử (chỉ cấp Cơ bản, ' + TRIAL_WORDS + ' từ).';
-  $('licForm').hidden = LIC.ok;
+  const guide = needInstall() && !LIC.ok;   // iOS trong Safari: ẩn Mã máy + ô kích hoạt, hướng dẫn cài app
+  $('licForm').hidden = LIC.ok || guide;
   $('admWords').hidden = !LIC.ok;
-  $('devId').textContent = $('devId0').textContent = fmtDeviceId(getDeviceId());
-  $('devPre').hidden = LIC.ok;
+  if (!guide) $('devId').textContent = $('devId0').textContent = fmtDeviceId(getDeviceId());
+  $('devPre').hidden = LIC.ok || guide;
+  $('iosGuide0').hidden = $('iosGuide1').hidden = !guide;
+  $('shopInfo').hidden = LIC.ok;
   const s = [SHOP.price && 'Giá: ' + SHOP.price, SHOP.zalo && 'Zalo: ' + SHOP.zalo, SHOP.bank && 'Chuyển khoản: ' + SHOP.bank, SHOP.note].filter(Boolean);
   $('shopInfo').innerHTML = s.map(t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;')).join('<br>') + '<br><a href="gioi-thieu.html#mua">Xem mã QR chuyển khoản</a>';
   if (LIC.ok) renderAdmin();
@@ -89,6 +92,7 @@ function copyDeviceId(btn) {
 $('devCopy').onclick = () => copyDeviceId($('devCopy'));
 $('devCopy0').onclick = () => copyDeviceId($('devCopy0'));
 $('licGo').onclick = async () => {
+  if (needInstall()) return $('licMsg').textContent = 'Hãy mở app từ Màn hình chính để kích hoạt.';
   if (!crypto.subtle) return $('licMsg').textContent = 'Trình duyệt chỉ kích hoạt được khi mở bằng https (hoặc localhost).';
   const r = await activateCode($('licCode').value);
   if (r === 'ok') { $('licMsg').textContent = ''; $('licCode').value = ''; renderLic(); }
