@@ -118,14 +118,28 @@ function refreshMenu() {
   if (menuMode === 'board') renderBoard();
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.mode === menuMode));
   $('licBanner').innerHTML = LIC.ok ? '✅ Bản đầy đủ' + (LIC.exp ? ' · hạn đến ' + fmtDate(LIC.exp) : '')
-    : LIC.expired ? '⚠️ Bản đầy đủ đã hết hạn ngày ' + fmtDate(LIC.exp) + ' · <a href="admin.html">Gia hạn (bố mẹ)</a>'
-    : `🎁 Bản dùng thử: cấp Cơ bản, ${TRIAL_WORDS} từ · <a href="gioi-thieu.html">Xem giá & mua</a> · <a href="admin.html">Kích hoạt (bố mẹ)</a>`;
+    : LIC.expired ? '⚠️ Bản đầy đủ đã hết hạn ngày ' + fmtDate(LIC.exp) + ' · <a href="#" id="btnAct">🔑 Nhập mã gia hạn</a>'
+    : `🎁 Bản dùng thử: cấp Cơ bản, ${TRIAL_WORDS} từ · <a href="gioi-thieu.html">Xem giá & mua</a> · <a href="#" id="btnAct">🔑 Nhập mã kích hoạt</a>`;
 }
+// ---------- nhập mã kích hoạt ngay trong game ----------
+function openAct() {
+  $('menu').hidden = true; $('actPanel').hidden = false;
+  $('actMsg').textContent = ''; $('actCode').value = ''; $('actCode').focus();
+}
+$('licBanner').onclick = e => { if (e.target.id === 'btnAct') { e.preventDefault(); openAct(); } };
+$('actCancel').onclick = showMenu;
+$('actGo').onclick = async () => {
+  $('actMsg').style.color = '#0a4a82'; $('actMsg').textContent = 'Đang kiểm tra…';
+  const res = await activateByCode($('actCode').value);
+  if (res.r === 'ok') { $('actMsg').style.color = '#2b8a3e'; $('actMsg').textContent = '✅ Đã kích hoạt! Chúc bé học vui.'; setTimeout(showMenu, 1200); }
+  else { $('actMsg').style.color = '#d9453d'; $('actMsg').textContent = actMessage(res); }
+};
+$('actCode').onkeydown = e => { if (e.key === 'Enter') $('actGo').click(); };
 function showMenu() {
   if (st) clearTimeout(st.nextT);   // huỷ bước chuyển từ đang chờ nếu thoát giữa chừng
   stopLoop(); clearFish(); delete $('sea').dataset.lvl;
   kid = null; clearTimeout(kidCardT); $('kidCard').hidden = true; $('hud').classList.remove('kid'); layer.classList.remove('kid');
-  $('menu').hidden = false; $('result').hidden = true; $('hud').hidden = true; $('study').hidden = true;
+  $('menu').hidden = false; $('result').hidden = true; $('hud').hidden = true; $('study').hidden = true; $('actPanel').hidden = true;
   refreshMenu();
 }
 
@@ -197,7 +211,7 @@ $('stBack').onclick = showMenu;
 $('stPlay').onclick = () => { $('study').hidden = true; startGame(study.lvl); };
 document.querySelectorAll('.lvl').forEach(b => b.onclick = () => {
   if (!LIC.ok && b.dataset.lvl !== 'basic') {
-    if (confirm('🔒 Cấp độ này có trong bản đầy đủ. Nhờ bố mẹ kích hoạt ở trang bố mẹ. Mở trang đó ngay?')) location.href = 'admin.html';
+    openAct();   // cấp này có trong bản đầy đủ: mời nhập mã kích hoạt
     return;
   }
   if (getPool(b.dataset.lvl).length < MIN_WORDS) return alert('Cấp độ này cần ít nhất ' + MIN_WORDS + ' từ. Nhờ bố mẹ vào trang Admin để thêm từ hoặc bỏ chế độ "chỉ dùng từ của tôi".');

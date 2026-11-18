@@ -67,38 +67,26 @@ function renderAdmin() {
 }
 
 
-// ---------- Kích hoạt bản đầy đủ ----------
+// ---------- Kích hoạt bản đầy đủ (mã ngắn do người bán gửi) ----------
 function renderLic() {
   $('licStatus').innerHTML = LIC.ok
     ? '✅ <b>Đã kích hoạt bản đầy đủ</b>' + (LIC.exp ? ' · còn hạn đến <b>' + fmtDate(LIC.exp) + '</b>' : ' (không hết hạn)') + '.'
-    : LIC.expired ? '⚠️ Bản đầy đủ <b>đã hết hạn ngày ' + fmtDate(LIC.exp) + '</b>. Nhập mã gia hạn mới để dùng tiếp (từ riêng của bố mẹ vẫn được giữ).'
+    : LIC.expired ? '⚠️ Bản đầy đủ <b>đã hết hạn ngày ' + fmtDate(LIC.exp) + '</b>. Nhập mã mới để gia hạn (từ riêng của bố mẹ vẫn được giữ).'
     : '🎁 Đang dùng bản dùng thử (chỉ cấp Cơ bản, ' + TRIAL_WORDS + ' từ).';
-  const guide = needInstall() && !LIC.ok;   // iOS trong Safari: ẩn Mã máy + ô kích hoạt, hướng dẫn cài app
-  $('licForm').hidden = LIC.ok || guide;
+  $('licForm').hidden = LIC.ok;
   $('admWords').hidden = !LIC.ok;
-  if (!guide) $('devId').textContent = $('devId0').textContent = fmtDeviceId(getDeviceId());
-  $('devPre').hidden = LIC.ok || guide;
-  $('iosGuide0').hidden = $('iosGuide1').hidden = !guide;
   $('shopInfo').hidden = LIC.ok;
-  const s = [SHOP.price && 'Giá: ' + SHOP.price, SHOP.zalo && 'Zalo: ' + SHOP.zalo, SHOP.bank && 'Chuyển khoản: ' + SHOP.bank, SHOP.note].filter(Boolean);
-  $('shopInfo').innerHTML = s.map(t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;')).join('<br>') + '<br><a href="gioi-thieu.html#mua">Xem mã QR chuyển khoản</a>';
+  const s = [SHOP.price && 'Giá: ' + SHOP.price, SHOP.zalo && 'Zalo: ' + SHOP.zalo, SHOP.note].filter(Boolean);
+  $('shopInfo').innerHTML = s.map(t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;')).join('<br>') + '<br><a href="gioi-thieu.html#mua">Xem cách mua và mã QR chuyển khoản</a>';
   if (LIC.ok) renderAdmin();
 }
-function copyDeviceId(btn) {
-  const old = btn.textContent;
-  navigator.clipboard.writeText(fmtDeviceId(getDeviceId())).then(() => btn.textContent = '✔ Đã chép', () => btn.textContent = 'Hãy bôi đen và copy');
-  setTimeout(() => btn.textContent = old, 2000);
-}
-$('devCopy').onclick = () => copyDeviceId($('devCopy'));
-$('devCopy0').onclick = () => copyDeviceId($('devCopy0'));
 $('licGo').onclick = async () => {
-  if (needInstall()) return $('licMsg').textContent = 'Hãy mở app từ Màn hình chính để kích hoạt.';
-  if (!crypto.subtle) return $('licMsg').textContent = 'Trình duyệt chỉ kích hoạt được khi mở bằng https (hoặc localhost).';
-  const r = await activateCode($('licCode').value);
-  if (r === 'ok') { $('licMsg').textContent = ''; $('licCode').value = ''; renderLic(); }
-  else if (r === 'expired') { $('licMsg').textContent = '⌛ Mã này đã hết hạn. Nhắn người bán để nhận mã mới.'; renderLic(); }
-  else $('licMsg').textContent = '❌ Mã không đúng cho thiết bị này. Kiểm tra lại mã máy và mã kích hoạt.';
+  $('licMsg').textContent = 'Đang kiểm tra…';
+  const res = await activateByCode($('licCode').value);
+  $('licMsg').textContent = res.r === 'ok' ? '' : actMessage(res);
+  if (res.r === 'ok') { $('licCode').value = ''; renderLic(); }
 };
+$('licCode').onkeydown = e => { if (e.key === 'Enter') $('licGo').click(); };
 
 licReady.then(() => { renderLic(); openPin(); });
 

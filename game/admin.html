@@ -17,20 +17,6 @@
 <main id="admin" class="card">
   <div id="pinBox">
     <h2>⚙️ Trang dành cho bố mẹ</h2>
-    <div class="devpre iosGuide" id="iosGuide0" hidden>
-      <div>
-        <p><b>📲 Để lấy Mã máy và kích hoạt trên iPhone/iPad:</b></p>
-        <ol>
-          <li>Mở trang này bằng <b>Safari</b>.</li>
-          <li>Bấm nút <b>Chia sẻ</b> (ô vuông có mũi tên lên) rồi chọn <b>Thêm vào Màn hình chính</b>.</li>
-          <li>Mở <b>app vừa cài</b> từ Màn hình chính và vào lại trang bố mẹ. <b>Mã máy sẽ hiện ra ở đó.</b></li>
-        </ol>
-      </div>
-    </div>
-    <div id="devPre" class="devpre">
-      <p>Mã máy của thiết bị này: <code id="devId0"></code> <button id="devCopy0" class="link">Sao chép</button></p>
-      <p class="hint">Muốn mua bản đầy đủ: gửi Mã máy này cho người bán để nhận mã kích hoạt.</p>
-    </div>
     <p id="pinHelp"></p>
     <input id="pinIn" type="password" inputmode="numeric" maxlength="8" placeholder="Mã PIN" autocomplete="off">
     <p id="pinMsg" class="err"></p>
@@ -41,20 +27,8 @@
     <section id="licBox">
       <h2>🔑 Kích hoạt bản đầy đủ</h2>
       <p id="licStatus"></p>
-      <div class="iosGuide" id="iosGuide1" hidden>
-        <div>
-        <p><b>📲 Để lấy Mã máy và kích hoạt trên iPhone/iPad:</b></p>
-        <ol>
-          <li>Mở trang này bằng <b>Safari</b>.</li>
-          <li>Bấm nút <b>Chia sẻ</b> (ô vuông có mũi tên lên) rồi chọn <b>Thêm vào Màn hình chính</b>.</li>
-          <li>Mở <b>app vừa cài</b> từ Màn hình chính và vào lại trang bố mẹ. <b>Mã máy sẽ hiện ra ở đó.</b></li>
-        </ol>
-      </div>
-      </div>
       <div id="licForm">
-        <p>Mã máy của thiết bị này:</p>
-        <p><code id="devId"></code> <button id="devCopy" class="link">Sao chép</button></p>
-        <textarea id="licCode" rows="3" placeholder="Dán mã kích hoạt vào đây"></textarea>
+        <input id="licCode" class="codeIn" placeholder="Nhập mã kích hoạt (XXXX-XXXX)" autocomplete="off" autocapitalize="characters" maxlength="12">
         <div class="row"><button id="licGo" class="big">Kích hoạt</button></div>
         <p id="licMsg" class="msg"></p>
       </div>

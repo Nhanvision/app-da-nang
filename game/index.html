@@ -50,6 +50,16 @@
 
 
   <!-- HỌC TỪ VỰNG -->
+  <!-- NHẬP MÃ KÍCH HOẠT -->
+  <section id="actPanel" class="panel" hidden>
+    <h2>🔑 Nhập mã kích hoạt</h2>
+    <p>Nhập mã người bán gửi cho bạn (8 ký tự).</p>
+    <input id="actCode" class="codeIn" placeholder="XXXX-XXXX" autocomplete="off" autocapitalize="characters" maxlength="12">
+    <p id="actMsg" class="msg2err"></p>
+    <div class="row"><button id="actGo" class="big">Kích hoạt</button><button id="actCancel" class="big alt">Quay lại</button></div>
+    <p class="hint2"><a href="gioi-thieu.html">Chưa có mã? Xem giá và cách mua</a></p>
+  </section>
+
   <section id="study" class="panel" hidden>
     <div class="studyTop"><button id="stBack" class="link">← Về menu</button><b id="stTitle"></b></div>
     <div id="card" class="card3d" tabindex="0" role="button" aria-label="Thẻ từ, bấm để lật">
@@ -97,6 +107,7 @@
   </section>
 </div>
 <script src="data.js"></script>
+<script src="config.js"></script>
 <script src="license-key.js"></script>
 <script src="license.js"></script>
 <script src="app.js"></script>

@@ -47,11 +47,43 @@ function applyLicense(r) {
   LIC.ok = !!r.valid && !LIC.expired;
 }
 
-// Kiểm tra mã đã lưu mỗi lần mở trang; các trang chờ licReady trước khi vẽ giao diện
+// Kiểm tra giấy phép đã lưu mỗi lần mở trang (mã ngắn kích hoạt qua máy chủ, hoặc mã ký số cũ); các trang chờ licReady trước khi vẽ giao diện
 const licReady = (async () => {
+  const l2 = store.get('license2', null), has2 = !!(l2 && /^\d{8}$/.test(l2.exp || ''));
+  if (has2) applyLicense({ valid: true, exp: l2.exp });
+  if (has2 && LIC.ok) return;
   const code = store.get('license', '');
-  applyLicense(code ? await checkCode(code, getDeviceId()) : { valid: false });
+  if (code) {
+    const r = await checkCode(code, getDeviceId());
+    if (r.valid) { applyLicense(r); if (LIC.ok) return; }
+  }
+  if (!has2) applyLicense({ valid: false });
 })();
+
+// Kích hoạt bằng mã ngắn: hỏi máy chủ (Google Sheet). Máy chủ đếm số máy và tính hạn từ lần kích hoạt đầu.
+async function activateByCode(raw) {
+  const code = String(raw).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (code.length !== 8) return { r: 'invalid' };
+  if (typeof ACTIVATE_URL === 'undefined' || !ACTIVATE_URL) return { r: 'noserver' };
+  let j;
+  try { j = await (await fetch(`${ACTIVATE_URL}?action=activate&code=${code}&device=${getDeviceId()}`)).json(); }
+  catch (e) { return { r: 'offline' }; }
+  if (j && j.ok && /^\d{8}$/.test(j.exp || '')) {
+    store.set('license2', { c: code, exp: j.exp });
+    applyLicense({ valid: true, exp: j.exp });
+    return { r: LIC.ok ? 'ok' : 'expired', exp: j.exp };
+  }
+  return { r: (j && j.reason) || 'error', exp: j && j.exp };
+}
+function actMessage(res) {
+  return ({
+    invalid: '❌ Mã chưa đúng. Bạn kiểm tra lại mã (8 ký tự, dạng XXXX-XXXX) nhé.',
+    full: '⚠️ Mã này đã dùng đủ số máy cho phép. Nhắn người bán để được hỗ trợ.',
+    expired: '⌛ Mã này đã hết hạn' + (res.exp ? ' (' + fmtDate(res.exp) + ')' : '') + '. Nhắn người bán để lấy mã mới.',
+    offline: '📶 Không kết nối được mạng. Bạn bật mạng rồi thử lại nhé.',
+    noserver: '⚙️ Chức năng kích hoạt chưa sẵn sàng. Bạn nhắn người bán giúp nhé.'
+  })[res.r] || '⚠️ Có lỗi, bạn thử lại sau ít phút nhé.';
+}
 
 // Trả về 'ok' | 'expired' (mã đúng nhưng đã quá hạn) | 'invalid' | 'install' (iOS, chưa mở từ app ở Màn hình chính)
 async function activateCode(raw) {

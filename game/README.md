@@ -18,9 +18,10 @@ Game ôn từ vựng tiếng Anh: đọc nghĩa tiếng Việt, **bấm vào con
 
 Chạy: mở `index.html` (trang con) hoặc `admin.html` (trang bố mẹ) hoặc `npx serve .`. Thêm từ: sửa mảng `WORDS` trong `data.js`.
 
-## Bán bản đầy đủ (dùng thử + mã kích hoạt)
-- Bản dùng thử: chỉ cấp Cơ bản với 10 từ đầu; cấp Trung bình/Nâng cao và nhập từ riêng bị khoá.
-- Khách mở `admin.html`, lấy **Mã máy**, thanh toán, rồi nhận **mã kích hoạt** riêng cho máy đó, có hạn (mặc định 1 năm; công cụ tạo mã có tuỳ chọn ngày hết hạn hoặc không hết hạn). Hết hạn thì quay về bản dùng thử, từ riêng vẫn được giữ; gia hạn bằng mã mới.
-- Người bán tạo mã bằng `tools/tao-ma/index.html` (cài được như app trên điện thoại): nạp file khoá bí mật một lần, đặt mật khẩu để lưu khoá (mã hoá AES-GCM) trên thiết bị, lần sau chỉ nhập mật khẩu + dán mã máy.
-- Khoá bí mật tạo bằng `node tools/tao-khoa.mjs <file>`; **không commit** file này. Khoá công khai nằm ở `game/license-key.js`.
-- Điền thông tin giá/Zalo/ngân hàng trong `game/config.js`.
+## Bán bản đầy đủ (dùng thử + mã kích hoạt ngắn)
+- Bản dùng thử: chỉ cấp Cơ bản với 10 từ; cấp Trung bình/Nâng cao và nhập từ riêng bị khoá.
+- Khách chuyển khoản (QR ở `gioi-thieu.html`), người bán gửi **một mã ngắn** `XXXX-XXXX` qua Zalo. Khách bấm **🔑 Nhập mã kích hoạt** trong game và gõ mã. Không cần Mã máy.
+- Mã được kiểm tra bởi một Google Sheet + Apps Script (`tools/kich-hoat/`, xem `HUONG-DAN.md`): hạn 1 năm tính từ lần kích hoạt đầu, mỗi mã tối đa 3 thiết bị, thu hồi bằng cách sửa cột "Số máy tối đa" về 0.
+- Địa chỉ máy chủ điền ở `ACTIVATE_URL` trong `game/config.js`. Chưa điền thì game báo "chức năng kích hoạt chưa sẵn sàng".
+- Giấy phép cũ (mã ký số theo Mã máy, `tools/tao-ma/`) vẫn dùng được cho khách đã mua trước đó.
+- Điền giá/Zalo/ngân hàng trong `game/config.js`.
