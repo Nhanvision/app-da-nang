@@ -11,4 +11,4 @@ const SHOP = {
   amount: 49000
 };
 // Địa chỉ máy chủ kích hoạt (Google Apps Script). Xem tools/kich-hoat/HUONG-DAN.md để tạo và dán URL vào đây.
-const ACTIVATE_URL = '';
+const ACTIVATE_URL = 'https://script.google.com/macros/s/AKfycbx2uCtu068uoQEJ4dKxrPhbC9n6i8XtPi_eZGnAc0A8Xi7SXmHWMJNJPPX-ebc0ajOnyg/exec';
