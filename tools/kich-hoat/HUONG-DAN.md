@@ -39,3 +39,12 @@ Trên iPhone/iPad, tab Safari và app thêm vào Màn hình chính lưu dữ li�
 - Cột E giờ ghi mỗi máy dạng `ID~dấu-vân-tay`. Mã đã kích hoạt trước đó chưa có dấu vân tay, máy đó nhập lại mã một lần là được bổ sung.
 - Hai điện thoại **giống hệt đời máy và phiên bản iOS** vẫn có thể thay chỗ nhau (tối đa 3 lần), đây là đánh đổi để khách dễ dùng.
 
+## Sao lưu tự động hằng tuần
+Google Sheet này giữ toàn bộ mã và danh sách khách, nên nên có bản sao lưu.
+1. Dán lại toàn bộ `google-apps-script.gs` mới, bấm 💾, rồi **Triển khai → Quản lý triển khai → ✏️ → Phiên bản mới → Triển khai**.
+2. Tải lại trang Sheet, vào menu **Đại Dương → Bật sao lưu tự động hằng tuần**. Google hỏi quyền truy cập **Google Drive** lần đầu: chọn tài khoản → Nâng cao → "Đi tới… (không an toàn)" → Cho phép (đây là script của chính anh).
+3. Xong: mỗi **sáng thứ Hai (khoảng 3 giờ)** script chép cả Sheet vào thư mục **"Đại Dương - Sao lưu mã kích hoạt"** trong Google Drive của anh, giữ **8 bản gần nhất** (cũ hơn tự vào thùng rác). Lần bật đầu tiên đã sao lưu một bản ngay để kiểm tra.
+- Sao lưu ngay lúc cần (ví dụ trước khi sửa lớn): menu **Đại Dương → Sao lưu ngay bây giờ**. Tắt: **Tắt sao lưu hằng tuần**.
+- Khôi phục: mở bản sao trong thư mục sao lưu, hoặc **Tệp → Tạo bản sao** từ bản đó. Nếu phải dùng Sheet khác thì cần triển khai script lại và đổi `ACTIVATE_URL` trong `game/config.js`.
+- Cách khác cho chắc: thỉnh thoảng tải Sheet về máy (Tệp → Tải xuống → .xlsx) và cất cùng file khoá bí mật.
+

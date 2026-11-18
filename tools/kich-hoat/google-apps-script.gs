@@ -26,7 +26,8 @@ function onOpen() {
   SpreadsheetApp.getUi().createMenu('Đại Dương')
     .addItem('Tạo 20 mã mới (1 máy)', 'gen20').addItem('Tạo 20 mã mới (2 máy, cho nhà có 2 điện thoại)', 'gen20x2').addItem('Tạo 50 mã mới (1 máy)', 'gen50')
     .addSeparator().addItem('Đặt lại máy của mã đang chọn', 'resetDevices')
-    .addItem('Đặt mật khẩu người bán (cho trang lấy mã)', 'setSellerKey').addToUi();
+    .addItem('Đặt mật khẩu người bán (cho trang lấy mã)', 'setSellerKey')
+    .addSeparator().addItem('Bật sao lưu tự động hằng tuần', 'enableWeeklyBackup').addItem('Sao lưu ngay bây giờ', 'backupNowUi').addItem('Tắt sao lưu hằng tuần', 'disableWeeklyBackup').addToUi();
 }
 function gen20() { generateCodes(20); }
 function gen50() { generateCodes(50); }
@@ -150,6 +151,40 @@ function sellerGen(n, maxDevices) {
   if (n < 1 || n > 100 || (maxDevices !== 1 && maxDevices !== 2)) return { ok: false, reason: 'bad_request' };
   generateCodes(n, maxDevices);
   return Object.assign({ ok: true }, sellerCounts(SpreadsheetApp.getActive().getSheetByName(SHEET_NAME).getDataRange().getValues()));
+}
+
+// ======== Sao lưu: mỗi tuần chép cả Google Sheet này vào thư mục "Đại Dương - Sao lưu mã kích hoạt" trong Google Drive của anh ========
+// Giữ BACKUP_KEEP bản mới nhất, bản cũ hơn tự chuyển vào thùng rác. Chỉ chạy trong tài khoản Google của chủ Sheet, không gửi dữ liệu đi đâu.
+const BACKUP_FOLDER = 'Đại Dương - Sao lưu mã kích hoạt', BACKUP_KEEP = 8;
+
+function backupFolder() {
+  const it = DriveApp.getFoldersByName(BACKUP_FOLDER);
+  return it.hasNext() ? it.next() : DriveApp.createFolder(BACKUP_FOLDER);
+}
+function backupNow() {
+  const ss = SpreadsheetApp.getActive(), folder = backupFolder();
+  const name = 'Sao lưu ' + ss.getName() + ' ' + Utilities.formatDate(new Date(), 'Asia/Ho_Chi_Minh', 'yyyy-MM-dd HH:mm');
+  const copy = DriveApp.getFileById(ss.getId()).makeCopy(name, folder);
+  const files = [], it = folder.getFiles();
+  while (it.hasNext()) files.push(it.next());
+  files.sort((a, b) => b.getDateCreated().getTime() - a.getDateCreated().getTime());
+  files.slice(BACKUP_KEEP).forEach(f => f.setTrashed(true));
+  return copy.getUrl();
+}
+function backupWeekly() { backupNow(); }   // hàm được hẹn giờ gọi
+function backupNowUi() {
+  const url = backupNow();
+  SpreadsheetApp.getUi().alert('Đã sao lưu. Bản sao nằm trong thư mục "' + BACKUP_FOLDER + '" ở Google Drive.\n' + url);
+}
+function disableWeeklyBackup() {
+  ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === 'backupWeekly').forEach(t => ScriptApp.deleteTrigger(t));
+  try { SpreadsheetApp.getUi().alert('Đã tắt sao lưu hằng tuần.'); } catch (e) {}
+}
+function enableWeeklyBackup() {
+  ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === 'backupWeekly').forEach(t => ScriptApp.deleteTrigger(t));
+  ScriptApp.newTrigger('backupWeekly').timeBased().onWeekDay(ScriptApp.WeekDay.MONDAY).atHour(3).create();
+  const url = backupNow();   // sao lưu luôn một bản để kiểm tra quyền truy cập Drive
+  SpreadsheetApp.getUi().alert('Đã bật sao lưu tự động mỗi tuần (khoảng 3 giờ sáng thứ Hai), giữ ' + BACKUP_KEEP + ' bản gần nhất trong thư mục "' + BACKUP_FOLDER + '" ở Google Drive.\nĐã sao lưu một bản ngay bây giờ:\n' + url);
 }
 
 function norm(s) { return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
