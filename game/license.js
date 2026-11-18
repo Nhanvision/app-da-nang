@@ -60,13 +60,25 @@ const licReady = (async () => {
   if (!has2) applyLicense({ valid: false });
 })();
 
+// Dấu vân tay nhẹ của điện thoại: giống nhau giữa tab Safari và app ở Màn hình chính của CÙNG một iPhone/iPad
+// (loại máy, phiên bản hệ điều hành chính, kích thước màn hình, ngôn ngữ, múi giờ). Máy chủ dùng để không báo "đã dùng ở máy khác" khi khách chỉ cài app lên Màn hình chính.
+function deviceFp() {
+  const ua = navigator.userAgent, paren = ((ua.match(/\(([^)]*)\)/) || ['', ''])[1]).replace(/(\d+)[_.]\d+([_.]\d+)*/g, '$1');
+  let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  const sw = (screen && screen.width) || 0, sh = (screen && screen.height) || 0;
+  const raw = [paren, Math.min(sw, sh) + 'x' + Math.max(sw, sh), window.devicePixelRatio || 1, navigator.language || '', tz].join('|');
+  let h = 2166136261;
+  for (let i = 0; i < raw.length; i++) { h ^= raw.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0).toString(36).toUpperCase().padStart(7, '0');
+}
+
 // Kích hoạt bằng mã ngắn: hỏi máy chủ (Google Sheet). Máy chủ đếm số máy và tính hạn từ lần kích hoạt đầu.
 async function activateByCode(raw) {
   const code = String(raw).toUpperCase().replace(/[^A-Z0-9]/g, '');
   if (code.length !== 8) return { r: 'invalid' };
   if (typeof ACTIVATE_URL === 'undefined' || !ACTIVATE_URL) return { r: 'noserver' };
   let j;
-  try { j = await (await fetch(`${ACTIVATE_URL}?action=activate&code=${code}&device=${getDeviceId()}`)).json(); }
+  try { j = await (await fetch(`${ACTIVATE_URL}?action=activate&code=${code}&device=${getDeviceId()}&fp=${deviceFp()}`)).json(); }
   catch (e) { return { r: 'offline' }; }
   if (j && j.ok && /^\d{8}$/.test(j.exp || '')) {
     store.set('license2', { c: code, exp: j.exp });

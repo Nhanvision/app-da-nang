@@ -17,7 +17,7 @@ function maxDev(v) { const n = Number(v); return (v !== '' && isFinite(n) && n >
 function setup() {
   const ss = SpreadsheetApp.getActive();
   const sh = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
-  sh.getRange(1, 1, 1, 7).setValues([['Mã', 'Số máy tối đa', 'Số ngày dùng', 'Hết hạn', 'Các máy', 'Kích hoạt đầu', 'Ghi chú (tên/Zalo khách)']]).setFontWeight('bold');
+  sh.getRange(1, 1, 1, 8).setValues([['Mã', 'Số máy tối đa', 'Số ngày dùng', 'Hết hạn', 'Các máy', 'Kích hoạt đầu', 'Ghi chú (tên/Zalo khách)', 'Số lần chuyển máy']]).setFontWeight('bold');
   sh.getRange('D:D').setNumberFormat('@'); sh.getRange('F:F').setNumberFormat('@');
   sh.setFrozenRows(1);
 }
@@ -159,7 +159,7 @@ function doGet(e) {
   const p = (e && e.parameter) || {};
   let out;
   try {
-    out = p.action === 'activate' ? activate(p.code, p.device)
+    out = p.action === 'activate' ? activate(p.code, p.device, p.fp)
         : p.action === 'stats' ? stats()
         : { ok: false, reason: 'bad_request' };
   }
@@ -175,8 +175,13 @@ function stats() {
   return { ok: true, sold: sold };
 }
 
-function activate(codeRaw, deviceRaw) {
-  const code = norm(codeRaw), dev = norm(deviceRaw).slice(0, 16);
+// Cùng một điện thoại iPhone/iPad có HAI "máy" riêng trong trình duyệt: tab Safari và app ở Màn hình chính (dữ liệu tách biệt).
+// Để khách nhập mã ở Safari rồi thêm app vào Màn hình chính không bị báo "mã đang dùng trên máy khác", app gửi thêm dấu vân tay `fp`
+// (loại máy + màn hình + ngôn ngữ + múi giờ). Khi mã đã đủ máy mà có một máy cũ CÙNG dấu vân tay, máy mới được thay chỗ (tối đa MAX_SWAPS lần/mã).
+const MAX_SWAPS = 3;
+
+function activate(codeRaw, deviceRaw, fpRaw) {
+  const code = norm(codeRaw), dev = norm(deviceRaw).slice(0, 16), fp = norm(fpRaw).slice(0, 12);
   if (code.length !== 8 || !dev) return { ok: false, reason: 'invalid' };
   const lock = LockService.getScriptLock();
   lock.waitLock(15000);
@@ -187,14 +192,24 @@ function activate(codeRaw, deviceRaw) {
       if (norm(rows[i][0]) !== code) continue;
       const max = maxDev(rows[i][1]);
       const days = Number(rows[i][2]) || DEFAULT_DAYS;
-      const devs = String(rows[i][4] || '').split(',').map(s => s.trim()).filter(Boolean);
+      let devs = String(rows[i][4] || '').split(',').map(s => s.trim()).filter(Boolean);   // mỗi máy: ID hoặc ID~dấu-vân-tay
       let exp = String(rows[i][3] || '').trim();
       const today = ymd(new Date());
       if (exp && today > exp) return { ok: false, reason: 'expired', exp: exp };
-      if (devs.indexOf(dev) < 0) {
-        if (devs.length >= max) return { ok: false, reason: 'full' };
-        devs.push(dev);
+      const idOf = s => s.split('~')[0], fpOf = s => s.split('~')[1] || '';
+      const mine = devs.findIndex(s => idOf(s) === dev);
+      if (mine >= 0) {
+        if (fp && !fpOf(devs[mine])) { devs[mine] = dev + '~' + fp; sh.getRange(i + 1, 5).setValue(devs.join(',')); }   // bổ sung dấu vân tay cho máy cũ
+      } else if (devs.length < max) {
+        devs.push(fp ? dev + '~' + fp : dev);
         sh.getRange(i + 1, 5).setValue(devs.join(','));
+      } else {
+        const same = fp ? devs.findIndex(s => fpOf(s) === fp) : -1;
+        const swaps = Number(rows[i][7]) || 0;
+        if (same < 0 || swaps >= MAX_SWAPS) return { ok: false, reason: 'full' };
+        devs[same] = dev + '~' + fp;   // cùng điện thoại (Safari <-> app Màn hình chính): chuyển chỗ
+        sh.getRange(i + 1, 5).setValue(devs.join(','));
+        sh.getRange(i + 1, 8).setValue(swaps + 1);
       }
       if (!exp) {   // lần kích hoạt đầu tiên của mã
         exp = ymd(new Date(Date.now() + days * 86400000));

@@ -34,3 +34,8 @@ Dùng hằng ngày:
 - Mục "Mã đã phát gần đây" cho thấy mã nào khách đã kích hoạt, hạn dùng, đang dùng mấy máy. Khách đổi máy: bấm **Đặt lại máy**.
 - Sắp hết mã: mở "Tạo thêm mã mới trong Sheet".
 
+## Cùng một iPhone: Safari và app Màn hình chính
+Trên iPhone/iPad, tab Safari và app thêm vào Màn hình chính lưu dữ liệu **tách biệt**, nên với server đó là hai "máy". Để khách không bị báo "mã đang dùng trên một máy khác" khi chỉ cài app lên Màn hình chính, app gửi thêm một **dấu vân tay** (loại máy, phiên bản iOS, kích thước màn hình, ngôn ngữ, múi giờ). Khi mã đã đủ máy mà có một máy cũ **cùng dấu vân tay**, máy mới được thay chỗ (tối đa 3 lần/mã, đếm ở cột H "Số lần chuyển máy"). Điện thoại khác hẳn (khác đời máy hoặc khác iOS) vẫn bị chặn.
+- Cột E giờ ghi mỗi máy dạng `ID~dấu-vân-tay`. Mã đã kích hoạt trước đó chưa có dấu vân tay, máy đó nhập lại mã một lần là được bổ sung.
+- Hai điện thoại **giống hệt đời máy và phiên bản iOS** vẫn có thể thay chỗ nhau (tối đa 3 lần), đây là đánh đổi để khách dễ dùng.
+
