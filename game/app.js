@@ -70,8 +70,8 @@ function sfx(name) {
   } catch (e) { /* trình duyệt không hỗ trợ âm thanh: bỏ qua */ }
 }
 // Nhớ lựa chọn bật/tắt âm thanh
-[['optSound', 'speech'], ['optSfx', 'sfx']].forEach(([id, key]) => {
-  $(id).checked = store.get(key, true);
+[['optSound', 'speech'], ['optSfx', 'sfx'], ['optSlow', 'slow']].forEach(([id, key]) => {
+  $(id).checked = store.get(key, id !== 'optSlow');   // "Đọc chậm" mặc định tắt
   $(id).onchange = () => store.set(key, $(id).checked);
 });
 
@@ -79,7 +79,7 @@ function speak(text, force) {
   if ((!force && !$('optSound').checked) || !('speechSynthesis' in window)) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; u.rate = 0.85;
+  u.lang = 'en-US'; u.rate = force && $('optSlow').checked ? 0.5 : 0.85;   // Bé tập nói + bật "Đọc chậm" thì đọc chậm hơn
   speechSynthesis.speak(u);
 }
 

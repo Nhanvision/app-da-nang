@@ -58,7 +58,7 @@ function renderAdmin() {
   const box = $('admList'); box.innerHTML = '';
   list.forEach((w, i) => {
     const s = document.createElement('span');
-    s.textContent = `${w[0]} = ${w[1]} `;
+    s.textContent = `${w[2] ? w[2] + ' ' : ''}${w[0]} = ${w[1]} `;
     const x = document.createElement('button');
     x.textContent = '✕'; x.title = 'Xoá';
     x.onclick = () => { const c = getCustom(); c[admLvl].splice(i, 1); store.set('custom', c); renderAdmin(); };
@@ -131,7 +131,7 @@ $('admFile').onchange = async e => {
       if (!Array.isArray(w) || typeof w[0] !== 'string' || typeof w[1] !== 'string' || !w[0].trim() || !w[1].trim()) { skipped++; continue; }
       const k = w[0].trim().toLowerCase();
       if (have.has(k)) { skipped++; continue; }
-      have.add(k); c[lvl].push([w[0].trim(), w[1].trim()]); added++;
+      have.add(k); c[lvl].push(typeof w[2] === 'string' && w[2] ? [w[0].trim(), w[1].trim(), w[2]] : [w[0].trim(), w[1].trim()]); added++;
     }
     if (data.only && data.only[lvl] === true) o[lvl] = true;
   }

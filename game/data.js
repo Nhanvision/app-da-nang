@@ -70,6 +70,19 @@ WORDS.adv.push(
   ['vulnerable','dễ bị tổn thương']
 );
 
+// ---- Hình minh hoạ (emoji) cho các từ cụ thể ở cấp Trung bình / Nâng cao; từ trừu tượng để trống ----
+const EMOJI_EXTRA = {
+  mid: { teacher:'🧑‍🏫', doctor:'🧑‍⚕️', kitchen:'🍳', bedroom:'🛏️', breakfast:'🥞', weather:'⛅', holiday:'🏖️', library:'📚', hospital:'🏥', market:'🛒',
+    beautiful:'🌺', dangerous:'⚠️', expensive:'💰', delicious:'😋', tired:'😫', travel:'🧳', mountain:'⛰️', island:'🏝️', neighbor:'🏘️', vegetable:'🥦',
+    umbrella:'☂️', strong:'💪', quiet:'🤫', journey:'🗺️', morning:'🌅', evening:'🌆', weekend:'🎉', airport:'✈️', station:'🚉', restaurant:'🍽️',
+    supermarket:'🛒', bakery:'🥖', museum:'🏛️', farmer:'🧑‍🌾', engineer:'👷', nurse:'👩‍⚕️', dentist:'🦷', pilot:'🧑‍✈️', police:'👮', dictionary:'📖',
+    newspaper:'📰', message:'💬', address:'🏠', password:'🔑', question:'❓', problem:'🧩', solution:'💡', accident:'💥', exercise:'🏃', medicine:'💊',
+    headache:'🤕', thirsty:'🥤', nervous:'😬', excited:'🤩', ancient:'🏺', modern:'🏙️', heavy:'🏋️', invite:'💌', arrive:'🛬', remember:'🧠', repeat:'🔁' },
+  adv: { environment:'🌍', pollution:'🏭', culture:'🎎', temperature:'🌡️', competition:'🏆', deadline:'⏰', knowledge:'🎓', communicate:'💬', achievement:'🥇',
+    courage:'🦁', generous:'🎁', curious:'🔍', deliver:'📦', improve:'📈', prevent:'🛑' }
+};
+for (const l in EMOJI_EXTRA) for (const w of WORDS[l]) { const e = EMOJI_EXTRA[l][w[0]]; if (e && !w[2]) w[2] = e; }
+
 // speed: px/giây, fish: số cá cùng lúc. Cơ bản bơi chậm cho bé nhỏ; Trung bình và Nâng cao bơi cùng tốc độ, khó hơn ở từ vựng.
 const LEVELS = {
   basic: { name: 'Cơ bản', speed: 50, fish: 6 },
@@ -110,7 +123,12 @@ function parseWords(text) {
     const line = raw.trim();
     if (!line) continue;
     const m = line.match(/^(.+?)\s*(?:\t|\s[-–—]\s|[-–—=|:])\s*(.+)$/);
-    if (m && /[A-Za-z]/.test(m[1])) ok.push([m[1].trim(), m[2].trim()]); else bad.push(line);
+    if (!(m && /[A-Za-z]/.test(m[1]))) { bad.push(line); continue; }
+    // Hình minh hoạ tuỳ chọn ở cuối dòng: "butterfly - con bướm 🦋" hoặc "butterfly - con bướm - 🦋"
+    let vi = m[2].trim(), emoji = '';
+    const e = vi.match(/^(.*?\S)\s*(?:[-–—=|:]\s*|\s)((?:\p{Extended_Pictographic}[️‍]*)+)$/u);
+    if (e) { vi = e[1].trim(); emoji = e[2]; }
+    ok.push(emoji ? [m[1].trim(), vi, emoji] : [m[1].trim(), vi]);
   }
   return { ok, bad };
 }
