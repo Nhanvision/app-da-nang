@@ -251,8 +251,8 @@ function kidWord() {   // lấy từ kế tiếp trong bộ bài đã trộn, tr
 function startKid() {
   if (st) clearTimeout(st.nextT);
   st = null; stopLoop(); clearFish();
-  const pool = getPool('basic').filter(w => w[2]);   // chỉ từ có hình cho bé dễ hiểu
-  if (pool.length < 3) return alert('Chưa đủ từ có hình để bé chơi.');
+  const pool = getPool('basic');   // từ không có hình thì thẻ hiện chữ to thay cho hình
+  if (pool.length < 3) return alert('Chưa đủ từ để bé chơi (cần ít nhất 3 từ ở cấp Cơ bản).');
   kid = { pool, deck: shuffle(pool), fish: [], n: Math.min(layer.clientHeight < 520 ? 4 : 5, pool.length) };
   $('sea').dataset.lvl = 'basic';
   $('menu').hidden = true; $('result').hidden = true; $('hud').hidden = false;
@@ -285,7 +285,7 @@ function onKidPick(f) {
   f.dead = true;
   const [en, vi, emoji] = f.word;
   speak(en, true); sfx('ok');
-  $('kcEmoji').textContent = emoji; $('kcEn').textContent = en; $('kcVi').textContent = vi;
+  $('kcEmoji').textContent = emoji || ''; $('kcEmoji').hidden = !emoji; $('kidCard').classList.toggle('big', !emoji); $('kcEn').textContent = en; $('kcVi').textContent = vi;
   const c = $('kidCard'); c.hidden = false; c.classList.remove('show'); void c.offsetWidth; c.classList.add('show');
   clearTimeout(kidCardT); kidCardT = setTimeout(() => { c.hidden = true; }, 2200);
   f.el.classList.add('ok');

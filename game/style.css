@@ -136,6 +136,7 @@ html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-syst
 #kidCard.show{animation:kcPop .35s ease-out}
 @keyframes kcPop{from{transform:translate(-50%,-50%) scale(.3);opacity:0}70%{transform:translate(-50%,-50%) scale(1.08)}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
 #kcEmoji{font-size:clamp(64px,16vh,110px);line-height:1.1}
+#kidCard.big #kcEn{font-size:clamp(48px,13vh,84px)}
 #kcEn{font-size:clamp(36px,9vh,60px);font-weight:900;color:#0a6ebd}
 #kcVi{font-size:clamp(26px,6vh,40px);font-weight:800;color:#2b8a3e}
 
